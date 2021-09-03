@@ -6,6 +6,7 @@ Pure-Tkinter real-time data-plotting class, launched as a separate process (with
 
 Reuben Brewer
 reuben.brewer@gmail.com
+
 www.reubotics.com
 
 Apache 2 License
