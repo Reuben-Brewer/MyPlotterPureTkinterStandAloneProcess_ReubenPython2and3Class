@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision E, 05/21/2022
+Software Revision G, 07/18/2022
 
 Verified working on: Python 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -15,18 +15,25 @@ THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON
 
 __author__ = 'reuben.brewer'
 
+#########################################################
 from MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class import *
 from MyPrint_ReubenPython2and3Class import *
+#########################################################
 
-import os, sys, platform
-import time, datetime
+#########################################################
+import os
+import sys
+import platform
+import time
+import datetime
 import threading
 import collections
-import math, numpy
+import math
 import traceback
 import re
+#########################################################
 
-###############
+#########################################################
 if sys.version_info[0] < 3:
     from Tkinter import * #Python 2
     import tkFont
@@ -35,22 +42,22 @@ else:
     from tkinter import * #Python 3
     import tkinter.font as tkFont #Python 3
     from tkinter import ttk
-###############
+#########################################################
 
-###############
+#########################################################
 if sys.version_info[0] < 3:
     from builtins import raw_input as input
 else:
     from future.builtins import input as input #"sudo pip3 install future" (Python 3) AND "sudo pip install future" (Python 2)
-###############
+#########################################################
 
-###############
+#########################################################
 import platform
 if platform.system() == "Windows":
     import ctypes
     winmm = ctypes.WinDLL('winmm')
     winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
-###############
+#########################################################
 
 ##########################################################################################################
 ##########################################################################################################
@@ -122,21 +129,11 @@ def GUI_update_clock():
 ##########################################################################################################
 ##########################################################################################################
 def ExitProgram_Callback():
-    global root
     global EXIT_PROGRAM_FLAG
-    global GUI_RootAfterCallbackInterval_Milliseconds
 
-    global MyPrint_ReubenPython2and3ClassObject
-    global MYPRINT_OPEN_FLAG
-
-    print("Exiting all threads in test_program_for_MyPrint_ReubenPython2and3Class.")
+    print("Exiting all threads in test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.")
 
     EXIT_PROGRAM_FLAG = 1
-
-    #########################################################
-    if MYPRINT_OPEN_FLAG == 1:
-        MyPrint_ReubenPython2and3ClassObject.ExitProgram_Callback()
-    #########################################################
 
 ##########################################################################################################
 ##########################################################################################################
@@ -309,7 +306,6 @@ if __name__ == '__main__':
 
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
                                                                                                 ("NumberOfPrintLines", 10),
-                                                                                                ("UseBorderAroundThisGuiObjectFlag", 0),
                                                                                                 ("GraphCanvasWidth", 1280),
                                                                                                 ("GraphCanvasHeight", 700),
                                                                                                 ("GraphCanvasWindowStartingX", 0),
@@ -410,14 +406,14 @@ if __name__ == '__main__':
         #################################################
         CurrentTime_MainLoopThread = getPreciseSecondsTimeStampString() - StartingTime_MainLoopThread
 
-        if CurrentTime_MainLoopThread > 5.0:
+        if CurrentTime_MainLoopThread > 10.0:
             EXIT_PROGRAM_FLAG = 1
         #################################################
         #################################################
 
         #################################################
         #################################################
-        if USE_PLOTTER_FLAG == 1:
+        if PLOTTER_OPEN_FLAG == 1:
 
             #################################################
             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
@@ -448,9 +444,22 @@ if __name__ == '__main__':
         ##################################################
         ##################################################
 
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalSendEndCommandToStandAloneProcess()
-    ExitProgram_Callback()
+    ################################################# THIS IS THE EXIT ROUTINE!
+    #################################################
+    print("MAIN LEADER PROGRAM Exiting main program 'test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.")
 
-    print("MAIN LEADER PROGRAM Exiting main program 'test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.")
+    #################################################
+    if MYPRINT_OPEN_FLAG == 1:
+        MyPrint_ReubenPython2and3ClassObject.ExitProgram_Callback()
+    #################################################
+
+    #################################################
+    if PLOTTER_OPEN_FLAG == 1:
+        MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
+    #################################################
+
+    #################################################
+    #################################################
+
 ##########################################################################################################
 ##########################################################################################################
