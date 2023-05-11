@@ -2,7 +2,8 @@
 
 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class
 
-Pure-Tkinter real-time data-plotting class, launched as a separate process (with separate Python interpreter) so as not to slow-down other code due to Python's GIL (Global Interpreter Lock).
+Pure-Tkinter real-time data-plotting class, launched as a separate process (with separate Python interpreter) so as not
+to slow-down other code due to Python's GIL (Global Interpreter Lock).
 
 Reuben Brewer, Ph.D.
 
@@ -12,7 +13,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision J, 09/21/2022
+Software Revision K, 05/10/2023
 
 Verified working on: 
 
@@ -32,6 +33,6 @@ MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDepend
 
 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_NestedLayers: ['future.builtins']
 
-MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_All: ['future.builtins', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil']
+MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_All:['future.builtins', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil']
 
 ###########################
