@@ -11,7 +11,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision J, 09/21/2022
+Software Revision K, 05/10/2023
 
 Verified working on: 
 Python 3.8 for Windows 8.1, 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
@@ -26,6 +26,6 @@ ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies: ['future.builtins', 'numpy', 'pexpect', 'psutil']
 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_TestProgram: ['MyPrint_ReubenPython2and3Class']
 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_NestedLayers: ['future.builtins']
-MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_All: ['future.builtins', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil']
+MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_All:['future.builtins', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil']
 
 ###########################
