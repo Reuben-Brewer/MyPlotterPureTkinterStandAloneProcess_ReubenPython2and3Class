@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision O, 11/03/2024
+Software Revision P, 02/02/2025
 
-Verified working on: Python 3.12 for Windows 8.1, 10, and 11 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.12 for Windows 11 64-bit, Ubuntu 20.04, and Raspberry Pi Buster.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
 "multiprocessing.set_start_method('spawn')" ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 '''
@@ -30,6 +30,7 @@ import collections
 import math
 import traceback
 import re
+import keyboard
 #########################################################
 
 #########################################################
@@ -62,13 +63,12 @@ def getPreciseSecondsTimeStampString():
 
 ##########################################################################################################
 ##########################################################################################################
-def ExitProgram_Callback():
+def ExitProgram_Callback(OptionalArugment = 0):
     global EXIT_PROGRAM_FLAG
 
     print("Exiting all threads in test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.")
 
     EXIT_PROGRAM_FLAG = 1
-
 ##########################################################################################################
 ##########################################################################################################
 
@@ -102,8 +102,11 @@ if __name__ == '__main__':
 
     ################################################
     ################################################
-    global USE_PLOTTER_FLAG
-    USE_PLOTTER_FLAG = 1
+    global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
+    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
+    
+    global USE_KEYBOARD_FLAG
+    USE_KEYBOARD_FLAG = 1
     ################################################
     ################################################
 
@@ -114,8 +117,8 @@ if __name__ == '__main__':
 
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
 
-    global PLOTTER_OPEN_FLAG
-    PLOTTER_OPEN_FLAG = -1
+    global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
+    MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
 
     global CurrentTime_MainLoopThread
     CurrentTime_MainLoopThread = -11111.0
@@ -175,23 +178,28 @@ if __name__ == '__main__':
                                                                                         ("YaxisLabelString", "Y-units (units)"),
                                                                                         ("ShowLegendFlag", 1)])
 
-    if USE_PLOTTER_FLAG == 1:
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
-            PLOTTER_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+
+            #################################################
+            if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
+                print("Failed to open MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.")
+                ExitProgram_Callback()
+            #################################################
 
         except:
             exceptions = sys.exc_info()[0]
             print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject, exceptions: %s" % exceptions)
-            #traceback.print_exc()
+            traceback.print_exc()
     #################################################
     #################################################
 
     #################################################
     #################################################
-    if PLOTTER_OPEN_FLAG != 1:
-        print("Failed to open MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.")
-        ExitProgram_Callback()
+    if USE_KEYBOARD_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
+        keyboard.on_press_key("esc", ExitProgram_Callback)
     #################################################
     #################################################
 
@@ -210,7 +218,7 @@ if __name__ == '__main__':
     print("TimeList: " + str(TimeList))
     print("DesiredAngleDeg_1_List: " + str(DesiredAngleDeg_1_List))
 
-    if PLOTTER_OPEN_FLAG == 1:
+    if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
 
         StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
 
@@ -254,7 +262,7 @@ if __name__ == '__main__':
     print("MAIN LEADER PROGRAM Exiting main program 'test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.")
 
     #################################################
-    if PLOTTER_OPEN_FLAG == 1:
+    if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
         MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
     #################################################
 
