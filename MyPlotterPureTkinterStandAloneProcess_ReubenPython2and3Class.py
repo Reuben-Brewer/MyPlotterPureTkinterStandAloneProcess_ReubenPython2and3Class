@@ -6,7 +6,7 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision P, 02/02/2025
+Software Revision Q, 03/07/2025
 
 Verified working on: Python 3.12 for Windows 11 64-bit, Ubuntu 20.04, and Raspberry Pi Buster.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -239,33 +239,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         ##########################################
 
         ##########################################
-        if "WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess" in setup_dict:
-            self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess", setup_dict["WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess"], 0.0, 1000.0)
-        else:
-            self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess = 0.0
-
-        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess: " + str(self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess))
-        ##########################################
-
-        ##########################################
-        if "AxisMinMaxEpsilon" in setup_dict:
-            self.AxisMinMaxEpsilon = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("AxisMinMaxEpsilon", setup_dict["AxisMinMaxEpsilon"], 0.000001, 1000.0)
-        else:
-            self.AxisMinMaxEpsilon = 0.000001
-
-        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: AxisMinMaxEpsilon: " + str(self.AxisMinMaxEpsilon))
-        ##########################################
-
-        ##########################################
-        if "CurvesToPlotNamesAndColorsDictOfLists" in setup_dict:
-            self.CurvesToPlotNamesAndColorsDictOfLists = setup_dict["CurvesToPlotNamesAndColorsDictOfLists"]
-        else:
-            self.CurvesToPlotNamesAndColorsDictOfLists = dict([(list(), "NameList"),(list(), "ColorList")])
-
-        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: CurvesToPlotNamesAndColorsDictOfLists: " + str(self.CurvesToPlotNamesAndColorsDictOfLists))
-        ##########################################
-
-        ##########################################
         self.ProcessVariablesThatCanBeLiveUpdated(setup_dict)
         ##########################################
 
@@ -284,30 +257,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         self.GraphBoxOutline_X0 = 50 #Offset from the Canvas object so that there's room for the axis-labels
         self.GraphBoxOutline_Y0 = 50 #Offset from the Canvas object so that there's room for the axis-labels
-
-        self.CurvesToPlotDictOfDicts = dict()
-
-        ########## IT APPEARS THAT IF THE VARIABLE IS CREATED BY THE PARENT BEFORE THE CHILD, THEN THE CHILD KNOWS ABOUT IT.
-        ########## HOWEVER, YOU CAN'T MODIFY IT, OUTSIDE OF THAT PROCESS.
-        ##########################################
-        if "NameList" in self.CurvesToPlotNamesAndColorsDictOfLists:
-            NameList = self.CurvesToPlotNamesAndColorsDictOfLists["NameList"]
-            if "ColorList" in self.CurvesToPlotNamesAndColorsDictOfLists:
-                ColorList = self.CurvesToPlotNamesAndColorsDictOfLists["ColorList"]
-
-                if len(NameList) == len(ColorList):
-                    for counter, element in enumerate(NameList):
-                        self.AddCurveToPlot(NameList[counter], ColorList[counter])
-                else:
-                    print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'CurveList' and 'NameList' must be the same length in self.CurvesToPlotNamesAndColorsDictOfLists.")
-                    return
-            else:
-                print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'CurveList' key must be in self.CurvesToPlotNamesAndColorsDictOfLists.")
-                return
-        else:
-            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'NameList' key must be in self.CurvesToPlotNamesAndColorsDictOfLists.")
-            return
-        ##########################################
 
         self.CurrentTime_CalculatedFromGUIthread = -11111.0
         self.LastTime_CalculatedFromGUIthread = -11111.0
@@ -334,6 +283,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     def ProcessVariablesThatCanBeLiveUpdated(self, setup_dict):
 
         ##########################################
+        ##########################################
         if "NumberOfDataPointToPlot" in setup_dict:
             self.NumberOfDataPointToPlot = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("NumberOfDataPointToPlot", setup_dict["NumberOfDataPointToPlot"], 0.0, 1000000))
         else:
@@ -341,7 +291,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: NumberOfDataPointToPlot: " + str(self.NumberOfDataPointToPlot))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "XaxisNumberOfTickMarks" in setup_dict:
             self.XaxisNumberOfTickMarks = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("XaxisNumberOfTickMarks", setup_dict["XaxisNumberOfTickMarks"], 0.0, 1000))
@@ -350,7 +302,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: XaxisNumberOfTickMarks: " + str(self.XaxisNumberOfTickMarks))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "YaxisNumberOfTickMarks" in setup_dict:
             self.YaxisNumberOfTickMarks = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("YaxisNumberOfTickMarks", setup_dict["YaxisNumberOfTickMarks"], 0.0, 1000))
@@ -359,7 +313,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: YaxisNumberOfTickMarks: " + str(self.YaxisNumberOfTickMarks))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "XaxisNumberOfDecimalPlacesForLabels" in setup_dict:
             self.XaxisNumberOfDecimalPlacesForLabels = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("XaxisNumberOfDecimalPlacesForLabels", setup_dict["XaxisNumberOfDecimalPlacesForLabels"], 0.0, 3.0))
@@ -368,7 +324,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: XaxisNumberOfDecimalPlacesForLabels: " + str(self.XaxisNumberOfDecimalPlacesForLabels))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "YaxisNumberOfDecimalPlacesForLabels" in setup_dict:
             self.YaxisNumberOfDecimalPlacesForLabels = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("YaxisNumberOfDecimalPlacesForLabels", setup_dict["YaxisNumberOfDecimalPlacesForLabels"], 0.0, 3.0))
@@ -377,7 +335,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: YaxisNumberOfDecimalPlacesForLabels: " + str(self.YaxisNumberOfDecimalPlacesForLabels))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "MarkerSize" in setup_dict:
             self.MarkerSize = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("MarkerSize", setup_dict["MarkerSize"], 0.0, 1080.0)
@@ -386,7 +346,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: MarkerSize: " + str(self.MarkerSize))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "X_min" in setup_dict:
             self.X_min = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("X_min", setup_dict["X_min"], -1000000000000.0, 1000000000000.0)
@@ -395,7 +357,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: X_min: " + str(self.X_min))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "X_max" in setup_dict:
             self.X_max = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("X_max", setup_dict["X_max"], -1000000000000.0, 1000000000000.0)
@@ -404,7 +368,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: X_max: " + str(self.X_max))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "Y_min" in setup_dict:
             self.Y_min = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("Y_min", setup_dict["Y_min"], -1000000000000.0, 1000000000000.0)
@@ -413,7 +379,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Y_min: " + str(self.Y_min))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "Y_max" in setup_dict:
             self.Y_max = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("Y_max", setup_dict["Y_max"], -1000000000000.0, 1000000000000.0)
@@ -422,7 +390,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Y_max: " + str(self.Y_max))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "XaxisAutoscaleFlag" in setup_dict:
             self.XaxisAutoscaleFlag = self.PassThrough0and1values_ExitProgramOtherwise("XaxisAutoscaleFlag", setup_dict["XaxisAutoscaleFlag"])
@@ -435,7 +405,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.X_min = 0  # Have to override any other X_min, X_max values that may have been passed-in in the setup_dict
             self.X_max = 0.1  # Have to override any other X_min, X_max values that may have been passed-in in the setup_dict
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "YaxisAutoscaleFlag" in setup_dict:
             self.YaxisAutoscaleFlag = self.PassThrough0and1values_ExitProgramOtherwise("YaxisAutoscaleFlag", setup_dict["YaxisAutoscaleFlag"])
@@ -448,7 +420,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.Y_min = 0  # Have to override any other X_min, X_max values that may have been passed-in in the setup_dict
             self.Y_max = 0.1  # Have to override any other X_min, X_max values that may have been passed-in in the setup_dict
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "XaxisDrawnAtBottomOfGraph" in setup_dict:
             self.XaxisDrawnAtBottomOfGraph = self.PassThrough0and1values_ExitProgramOtherwise("XaxisDrawnAtBottomOfGraph", setup_dict["XaxisDrawnAtBottomOfGraph"])
@@ -457,7 +431,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: XaxisDrawnAtBottomOfGraph: " + str(self.XaxisDrawnAtBottomOfGraph))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "ShowLegendFlag" in setup_dict:
             self.ShowLegendFlag = self.PassThrough0and1values_ExitProgramOtherwise("ShowLegendFlag", setup_dict["ShowLegendFlag"])
@@ -466,7 +442,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: ShowLegendFlag: " + str(self.ShowLegendFlag))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "XaxisLabelString" in setup_dict:
             self.XaxisLabelString = str(setup_dict["XaxisLabelString"])
@@ -475,7 +453,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: XaxisLabelString: " + str(self.XaxisLabelString))
         ##########################################
+        ##########################################
 
+        ##########################################
         ##########################################
         if "YaxisLabelString" in setup_dict:
             self.YaxisLabelString = str(setup_dict["YaxisLabelString"])
@@ -483,6 +463,65 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.YaxisLabelString = ""
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: YaxisLabelString: " + str(self.YaxisLabelString))
+        ##########################################
+        ##########################################
+
+        ##########################################
+        ##########################################
+
+        ##########################################
+        if "CurvesToPlotNamesAndColorsDictOfLists" in setup_dict:
+            self.CurvesToPlotNamesAndColorsDictOfLists = setup_dict["CurvesToPlotNamesAndColorsDictOfLists"]
+        else:
+            self.CurvesToPlotNamesAndColorsDictOfLists = dict([(list(), "NameList"),(list(), "ColorList")])
+
+        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: CurvesToPlotNamesAndColorsDictOfLists: " + str(self.CurvesToPlotNamesAndColorsDictOfLists))
+        ##########################################
+
+        ##########################################
+        self.CurvesToPlotDictOfDicts = dict()
+        if "NameList" in self.CurvesToPlotNamesAndColorsDictOfLists:
+            NameList = self.CurvesToPlotNamesAndColorsDictOfLists["NameList"]
+            if "ColorList" in self.CurvesToPlotNamesAndColorsDictOfLists:
+                ColorList = self.CurvesToPlotNamesAndColorsDictOfLists["ColorList"]
+
+                if len(NameList) == len(ColorList):
+                    for counter, element in enumerate(NameList):
+                        self.AddCurveToPlot(NameList[counter], ColorList[counter])
+                else:
+                    print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'CurveList' and 'NameList' must be the same length in self.CurvesToPlotNamesAndColorsDictOfLists.")
+                    return
+            else:
+                print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'CurveList' key must be in self.CurvesToPlotNamesAndColorsDictOfLists.")
+                return
+        else:
+            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'NameList' key must be in self.CurvesToPlotNamesAndColorsDictOfLists.")
+            return
+        ##########################################
+
+        ##########################################
+        ##########################################
+
+        ##########################################
+        ##########################################
+        if "WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess" in setup_dict:
+            self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess", setup_dict["WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess"], 0.0, 1000.0)
+        else:
+            self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess = 0.0
+
+        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess: " + str(self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess))
+        ##########################################
+        ##########################################
+
+        ##########################################
+        ##########################################
+        if "AxisMinMaxEpsilon" in setup_dict:
+            self.AxisMinMaxEpsilon = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("AxisMinMaxEpsilon", setup_dict["AxisMinMaxEpsilon"], 0.000001, 1000.0)
+        else:
+            self.AxisMinMaxEpsilon = 0.000001
+
+        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: AxisMinMaxEpsilon: " + str(self.AxisMinMaxEpsilon))
+        ##########################################
         ##########################################
 
     ##########################################################################################################
@@ -559,19 +598,20 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
                                 self.EXIT_PROGRAM_FLAG = 1
 
                             else:
-                                CurveName = inputDict["CurveName"]
-                                x = inputDict["x"]
-                                y = inputDict["y"]
+                                if "CurveName" in inputDict:
+                                    CurveName = inputDict["CurveName"]
+                                    x = inputDict["x"]
+                                    y = inputDict["y"]
 
-                                #print(str([x,y]))
+                                    #print(str([x,y]))
 
-                                self.AddPointOrListOfPointsToPlot(CurveName, x, y)
+                                    self.AddPointOrListOfPointsToPlot(CurveName, x, y)
                         ###############
 
                     except:
                         exceptions = sys.exc_info()[0]
                         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class StandAlonePlottingProcess, exceptions: %s" % exceptions)
-                        #traceback.print_exc()
+                        traceback.print_exc()
                 #############################################
 
                 self.MostRecentDataDict = dict([("CurvesToPlotDictOfDicts", self.CurvesToPlotDictOfDicts),
@@ -970,23 +1010,35 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     ##########################################################################################################
     def ExternalAddPointOrListOfPointsToPlot(self, CurveName, x, y):
 
-        if self.IsInputList(CurveName) == 1:
+        ###########################################
+        if self.IsInputList(CurveName) == 0:
+            CurveName = [CurveName]
+        ###########################################
 
-            #####
-            if len(CurveName) != len(x) or len(CurveName) != len(y):
-                print("ExternalAddPointOrListOfPointsToPlot: ERROR, length of CurveName (" +
-                      str(len(CurveName)) + "), x ("
-                      + str(len(x)) + "), and y (" +
-                      str(len(y)) + ") inputs must all match!")
-            #####
+        ###########################################
+        if self.IsInputList(x) == 0:
+            x= [x]
+        ###########################################
 
-            #####
-            for index, CurveNameElement in enumerate(CurveName):
-                self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveNameElement), ("x", x[index]), ("y", y[index])]))
-            #####
+        ###########################################
+        if self.IsInputList(y) == 0:
+            y = [y]
+        ###########################################
 
-        else:
-            self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveName), ("x", x), ("y", y)]))
+        ###########################################
+        if len(CurveName) != len(x) or len(CurveName) != len(y):
+            print("ExternalAddPointOrListOfPointsToPlot: ERROR, length of CurveName (" +
+                  str(len(CurveName)) + "), x ("
+                  + str(len(x)) + "), and y (" +
+                  str(len(y)) + ") inputs must all match!")
+
+            return
+        ###########################################
+
+        ########################################### At this level, we don't have scope to check if CurveNameElement is contained in self.CurvesToPlotDictOfDicts
+        for index, CurveNameElement in enumerate(CurveName):
+            self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveNameElement), ("x", x[index]), ("y", y[index])]))
+        ###########################################
 
     ##########################################################################################################
     ##########################################################################################################
