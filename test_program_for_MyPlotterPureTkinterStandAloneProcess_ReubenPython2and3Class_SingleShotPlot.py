@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision Q, 03/07/2025
+Software Revision R, 03/27/2025
 
 Verified working on: Python 3.12 for Windows 11 64-bit, Ubuntu 20.04, and Raspberry Pi Buster.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -115,25 +115,29 @@ if __name__ == '__main__':
     global EXIT_PROGRAM_FLAG
     EXIT_PROGRAM_FLAG = 0
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
-
-    global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
-    MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
-
     global CurrentTime_MainLoopThread
     CurrentTime_MainLoopThread = -11111.0
 
     global StartingTime_MainLoopThread
     StartingTime_MainLoopThread = -11111.0
 
-    global SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle
-    SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle = 2.0
+    global SinusoidalMotionInput_ROMtestTimeToPeakAngle
+    SinusoidalMotionInput_ROMtestTimeToPeakAngle = 2.0
 
-    global SINUSOIDAL_MOTION_INPUT_MinValue
-    SINUSOIDAL_MOTION_INPUT_MinValue = -50
+    global SinusoidalMotionInput_MinValue
+    SinusoidalMotionInput_MinValue = -50
 
-    global SINUSOIDAL_MOTION_INPUT_MaxValue
-    SINUSOIDAL_MOTION_INPUT_MaxValue = 50
+    global SinusoidalMotionInput_MaxValue
+    SinusoidalMotionInput_MaxValue = 50
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
+
+    global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
+    MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
     #################################################
     #################################################
 
@@ -161,6 +165,7 @@ if __name__ == '__main__':
                                                                                         ("ParentPID", os.getpid()),
                                                                                         ("WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess", 10.0),
                                                                                         ("MarkerSize", 3),
+                                                                                        ("LineWidth", 3),
                                                                                         ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PlotCurve0", "PlotCurve1", "PlotCurve2"]),("ColorList", ["Red", "Green", "Blue"])])),
                                                                                         ("NumberOfDataPointToPlot", 25),
                                                                                         ("XaxisNumberOfTickMarks", 10),
@@ -183,16 +188,20 @@ if __name__ == '__main__':
             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
             MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
-            #################################################
-            if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
-                print("Failed to open MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.")
-                ExitProgram_Callback()
-            #################################################
-
         except:
             exceptions = sys.exc_info()[0]
             print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject, exceptions: %s" % exceptions)
             traceback.print_exc()
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
+                print("Failed to open MyPlotterPureTkinterClass_Object.")
+                ExitProgram_Callback()
     #################################################
     #################################################
 
@@ -210,13 +219,10 @@ if __name__ == '__main__':
     DesiredAngleDeg_1_List = list()
 
     for TimeIndex in range(0, 100):
-        TimeGain = math.pi / (2.0 * SINUSOIDAL_MOTION_INPUT_ROMtestTimeToPeakAngle)
-        DesiredAngleDeg_1 = 0.5*(SINUSOIDAL_MOTION_INPUT_MaxValue + SINUSOIDAL_MOTION_INPUT_MinValue) + math.exp(0.1*TimeIndex)*0.5 * abs(SINUSOIDAL_MOTION_INPUT_MaxValue - SINUSOIDAL_MOTION_INPUT_MinValue) * math.sin(TimeGain * TimeIndex)  # AUTOMATIC SINUSOIDAL MOVEMENT
+        TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
+        DesiredAngleDeg_1 = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.1*TimeIndex)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.sin(TimeGain * TimeIndex)  # AUTOMATIC SINUSOIDAL MOVEMENT
         TimeList.append(TimeIndex)
         DesiredAngleDeg_1_List.append(DesiredAngleDeg_1)
-
-    print("TimeList: " + str(TimeList))
-    print("DesiredAngleDeg_1_List: " + str(DesiredAngleDeg_1_List))
 
     if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
 
@@ -245,7 +251,9 @@ if __name__ == '__main__':
 
             #################################################
             if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot("PlotCurve0", TimeList, DesiredAngleDeg_1_List)
+                print("TimeList: " + str(TimeList))
+                print("DesiredAngleDeg_1_List: " + str(DesiredAngleDeg_1_List))
+                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot("PlotCurve0", TimeList, DesiredAngleDeg_1_List, OverrideCurveAndPointListsMustMatchInLengthFlag=1)
             #################################################
 
             time.sleep(0.060)
