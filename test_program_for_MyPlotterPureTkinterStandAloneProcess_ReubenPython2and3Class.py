@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision R, 03/27/2025
+Software Revision S, 05/27/2025
 
-Verified working on: Python 3.12 for Windows 11 64-bit, Ubuntu 20.04, and Raspberry Pi Buster.
+Verified working on: Python 3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
 "multiprocessing.set_start_method('spawn')" ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 '''
@@ -278,6 +278,15 @@ if __name__ == '__main__':
 
     global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
     MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
+
+    global MyPlotterPureTkinterStandAloneProcess_MostRecentDict
+    MyPlotterPureTkinterStandAloneProcess_MostRecentDict = dict()
+
+    global MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
+    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
+
+    global LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess
+    LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = -11111.0
     #################################################
     #################################################
 
@@ -305,14 +314,7 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    global MyPlotterPureTkinter_MostRecentDict
-    MyPlotterPureTkinter_MostRecentDict = dict()
-
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
-
-
-
+    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
                                                                                                 ("NumberOfPrintLines", 10),
                                                                                                 ("GraphCanvasWidth", 1280),
@@ -326,9 +328,10 @@ if __name__ == '__main__':
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
                                                                                         ("ParentPID", os.getpid()),
                                                                                         ("WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess", 10.0),
-                                                                                        ("MarkerSize", 0),
-                                                                                        ("LineWidth", 4),
-                                                                                        ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PlotCurve0", "PlotCurve1", "PlotCurve2"]),("ColorList", ["Red", "Green", "Blue"])])),
+                                                                                        ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PlotCurve1", "PlotCurve2", "PlotCurve3"]),
+                                                                                                                                    ("MarkerSizeList", [3, 2, 1]),
+                                                                                                                                    ("LineWidthList", [2, 1, 0]),
+                                                                                                                                    ("ColorList", ["Red", "Green", "Blue"])])),
                                                                                         ("NumberOfDataPointToPlot", 25),
                                                                                         ("XaxisNumberOfTickMarks", 10),
                                                                                         ("YaxisNumberOfTickMarks", 10),
@@ -424,6 +427,9 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
+    #################################################
+    #################################################
+    #################################################
     while(EXIT_PROGRAM_FLAG == 0):
 
         #################################################
@@ -437,36 +443,19 @@ if __name__ == '__main__':
 
         #################################################
         #################################################
+        if USE_SINUSOIDAL_TEST_FLAG == 1:
+
+            TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
+            DesiredAngleDeg_1 = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.1*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.sin(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
+            DesiredAngleDeg_2 = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.05*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.cos(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
+            DesiredAngleDeg_3 = 0.25*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.03*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.tan(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
+        #################################################
+        #################################################
+
+        #################################################
+        #################################################
         if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
 
-            #################################################
-            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
-            #print(str(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict))
-
-            if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict:
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
-            else:
-                pass
-            #################################################
-
-            #################################################
-            if USE_SINUSOIDAL_TEST_FLAG == 1:
-                TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
-                DesiredAngleDeg_1 = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.1*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.sin(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
-                DesiredAngleDeg_2 = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.05*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.cos(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
-                DesiredAngleDeg_3 = 0.25*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.03*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.tan(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
-
-                if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
-                    #pass
-                    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot("PlotCurve0", CurrentTime_MainLoopThread, DesiredAngleDeg_1)
-                    #MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot("PlotCurve1", CurrentTime_MainLoopThread, DesiredAngleDeg_2)
-                    #MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot("PlotCurve2", CurrentTime_MainLoopThread, DesiredAngleDeg_3)
-
-                time.sleep(0.050)
-            #################################################
-
-            #################################################
-            #################################################
             if TestButton_EventNeedsToBeHandledFlag == 1:
 
                 #################################################
@@ -478,11 +467,46 @@ if __name__ == '__main__':
 
                 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalUpdateSetupDict(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
                 TestButton_EventNeedsToBeHandledFlag = 0
+        #################################################
+        #################################################
+
+        ################################################# SET's
+        #################################################
+        if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
+
             #################################################
+            try:
+                MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
+
+                if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_MostRecentDict:
+                    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
+
+                    if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
+                        if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.040:
+                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["PlotCurve1",
+                                                                                                                                     "PlotCurve2",
+                                                                                                                                     "PlotCurve3"],
+                                                                                                                                    [CurrentTime_MainLoopThread]*3,
+                                                                                                                                    [DesiredAngleDeg_1,
+                                                                                                                                     DesiredAngleDeg_2,
+                                                                                                                                     DesiredAngleDeg_3])
+
+                            LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_MainLoopThread
             #################################################
 
-        ##################################################
-        ##################################################
+            ####################################################
+            except:
+                exceptions = sys.exc_info()[0]
+                print("MyPlotterPureTkinterStandAloneProcess, exceptions: %s" % exceptions)
+                traceback.print_exc()
+            ####################################################
+
+        #################################################
+        #################################################
+
+    #################################################
+    #################################################
+    #################################################
 
     ################################################# THIS IS THE EXIT ROUTINE!
     #################################################

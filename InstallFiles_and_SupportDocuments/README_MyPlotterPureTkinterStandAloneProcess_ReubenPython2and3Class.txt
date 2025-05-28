@@ -13,7 +13,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision R, 03/27/2025
+Software Revision S, 05/27/2025
 
 Verified working on:
 
@@ -23,7 +23,7 @@ Windows 10/11 64-bit
 
 Ubuntu 20.04, and
 
-and Raspberry Pi 4/5.
+and Raspberry Pi 4/5 Bookworm.
 
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT 
 AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF "multiprocessing.set_start_method('spawn')" 
