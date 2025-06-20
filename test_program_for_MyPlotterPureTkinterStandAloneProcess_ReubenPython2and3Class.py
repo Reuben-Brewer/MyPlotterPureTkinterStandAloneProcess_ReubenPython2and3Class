@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision S, 05/27/2025
+Software Revision T, 06/19/2025
 
 Verified working on: Python 3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -331,6 +331,8 @@ if __name__ == '__main__':
                                                                                         ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PlotCurve1", "PlotCurve2", "PlotCurve3"]),
                                                                                                                                     ("MarkerSizeList", [3, 2, 1]),
                                                                                                                                     ("LineWidthList", [2, 1, 0]),
+                                                                                                                                    ("IncludeInXaxisAutoscaleCalculationList", [1, 1, 1]),
+                                                                                                                                    ("IncludeInYaxisAutoscaleCalculationList", [1, 1, 1]),
                                                                                                                                     ("ColorList", ["Red", "Green", "Blue"])])),
                                                                                         ("NumberOfDataPointToPlot", 25),
                                                                                         ("XaxisNumberOfTickMarks", 10),
