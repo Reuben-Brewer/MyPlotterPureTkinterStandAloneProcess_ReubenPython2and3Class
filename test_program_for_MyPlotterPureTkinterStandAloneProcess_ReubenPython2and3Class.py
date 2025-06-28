@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision T, 06/19/2025
+Software Revision U, 06/27/2025
 
 Verified working on: Python 3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -334,7 +334,7 @@ if __name__ == '__main__':
                                                                                                                                     ("IncludeInXaxisAutoscaleCalculationList", [1, 1, 1]),
                                                                                                                                     ("IncludeInYaxisAutoscaleCalculationList", [1, 1, 1]),
                                                                                                                                     ("ColorList", ["Red", "Green", "Blue"])])),
-                                                                                        ("NumberOfDataPointToPlot", 25),
+                                                                                        ("NumberOfDataPointToPlot", 100),
                                                                                         ("XaxisNumberOfTickMarks", 10),
                                                                                         ("YaxisNumberOfTickMarks", 10),
                                                                                         ("XaxisNumberOfDecimalPlacesForLabels", 3),
@@ -348,7 +348,9 @@ if __name__ == '__main__':
                                                                                         ("XaxisDrawnAtBottomOfGraph", 0),
                                                                                         ("XaxisLabelString", "Time (sec)"),
                                                                                         ("YaxisLabelString", "Y-units (units)"),
-                                                                                        ("ShowLegendFlag", 1)])
+                                                                                        ("ShowLegendFlag", 1),
+                                                                                        ("GraphNumberOfLeadingZeros", 0),
+                                                                                        ("GraphNumberOfDecimalPlaces", 3)])
     
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
@@ -438,7 +440,7 @@ if __name__ == '__main__':
         #################################################
         CurrentTime_MainLoopThread = getPreciseSecondsTimeStampString() - StartingTime_MainLoopThread
 
-        if CurrentTime_MainLoopThread > 10.0:
+        if CurrentTime_MainLoopThread > 30:
             ExitProgram_Callback()
         #################################################
         #################################################
@@ -484,7 +486,7 @@ if __name__ == '__main__':
                     MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
 
                     if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
-                        if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.040:
+                        if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict["GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents"]/1000.0 + 0.001:
                             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["PlotCurve1",
                                                                                                                                      "PlotCurve2",
                                                                                                                                      "PlotCurve3"],

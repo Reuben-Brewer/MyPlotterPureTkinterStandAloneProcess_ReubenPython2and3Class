@@ -6,7 +6,7 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision T, 06/19/2025
+Software Revision U, 06/27/2025
 
 Verified working on: Python 3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -33,6 +33,13 @@ import platform
 import psutil
 import pexpect
 import subprocess
+
+try:
+    import pyautogui
+    pyautogui_ModuleImportedFlag = 1
+except:
+    pyautogui_ModuleImportedFlag = 0
+    print("Error: the module 'pyautogui' cvould not be imported.")
 #########################################################
 
 #########################################################
@@ -83,6 +90,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     def __init__(self, setup_dict):
 
         self.OBJECT_CREATED_SUCCESSFULLY_FLAG = 0
+
+        self.pyautogui_ModuleImportedFlag = pyautogui_ModuleImportedFlag
 
         #########################################################
         #########################################################
@@ -260,15 +269,20 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         self.CurrentTime_CalculatedFromGUIthread = -11111.0
         self.LastTime_CalculatedFromGUIthread = -11111.0
+        self.StartingTime_CalculatedFromGUIthread = -11111.0
         self.LoopFrequency_CalculatedFromGUIthread = -11111.0
         self.LoopDeltaT_CalculatedFromGUIthread = -11111.0
 
         self.CurrentTime_CalculatedFromStandAlonePlottingProcess = -11111.0
         self.LastTime_CalculatedFromStandAlonePlottingProcess = -11111.0
+        self.StartingTime_CalculatedFromStandAlonePlottingProcess = -11111.0
         self.LoopFrequency_CalculatedFromStandAlonePlottingProcess = -11111.0
         self.LoopDeltaT_CalculatedFromStandAlonePlottingProcess = -11111.0
 
         self.StandAlonePlottingProcess_ReadyForWritingFlag = 0
+
+        self.FreezePlotFlag = 0
+        self.SavePlotFlag = 0
 
         self.MostRecentDataDict = dict()
         #########################################################
@@ -546,6 +560,28 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         ##########################################
         ##########################################
 
+        ##########################################
+        ##########################################
+        if "GraphNumberOfLeadingZeros" in setup_dict:
+            self.GraphNumberOfLeadingZeros = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GraphNumberOfLeadingZeros", setup_dict["GraphNumberOfLeadingZeros"], 0.0, 10.0))
+        else:
+            self.GraphNumberOfLeadingZeros = 2
+
+        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: GraphNumberOfLeadingZeros: " + str(self.GraphNumberOfLeadingZeros))
+        ##########################################
+        ##########################################
+
+        ##########################################
+        ##########################################
+        if "GraphNumberOfDecimalPlaces" in setup_dict:
+            self.GraphNumberOfDecimalPlaces = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GraphNumberOfDecimalPlaces", setup_dict["GraphNumberOfDecimalPlaces"], 0.0, 10.0))
+        else:
+            self.GraphNumberOfDecimalPlaces = 5
+
+        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: GraphNumberOfDecimalPlaces: " + str(self.GraphNumberOfDecimalPlaces))
+        ##########################################
+        ##########################################
+
     ##########################################################################################################
     ##########################################################################################################
 
@@ -562,7 +598,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         #############################################
         if self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess > 0.0:
-            if self.getPreciseSecondsTimeStampString() - self.LastTime_CalculatedFromStandAlonePlottingProcess >= self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess:
+            if self.CurrentTime_CalculatedFromStandAlonePlottingProcess - self.LastTime_CalculatedFromStandAlonePlottingProcess >= self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess:
                 print("***** MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, Watchdog fired! *****")
                 self.EXIT_PROGRAM_FLAG = 1
         #############################################
@@ -580,7 +616,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         self.StartGUI()
 
-        self.LastTime_CalculatedFromStandAlonePlottingProcess = self.getPreciseSecondsTimeStampString()
+        self.StartingTime_CalculatedFromStandAlonePlottingProcess = self.getPreciseSecondsTimeStampString()
+        self.LastTime_CalculatedFromStandAlonePlottingProcess = self.StartingTime_CalculatedFromStandAlonePlottingProcess
 
         self.StandAlonePlottingProcess_ReadyForWritingFlag = 1
 
@@ -602,8 +639,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
                         ###############
 
                         ###############
-                        self.CurrentTime_CalculatedFromStandAlonePlottingProcess = self.getPreciseSecondsTimeStampString()
-                        #print("self.CurrentTime_CalculatedFromStandAlonePlottingProcess: " + str(self.CurrentTime_CalculatedFromStandAlonePlottingProcess))
+                        self.CurrentTime_CalculatedFromStandAlonePlottingProcess = self.getPreciseSecondsTimeStampString() - self.StartingTime_CalculatedFromStandAlonePlottingProcess
+
                         self.UpdateFrequencyCalculation_CalculatedFromStandAlonePlottingProcess()
                         ###############
 
@@ -953,6 +990,18 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
     ##########################################################################################################
     ##########################################################################################################
+    def getTimeStampString(self):
+
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime('%m_%d_%Y---%H_%M_%S')
+
+        return st
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     def GetMostRecentDataDict(self):
 
         try:
@@ -1169,12 +1218,16 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     def GUI_Thread(self):
 
         ###################################################
+        ###################################################
         self.root = Tk()
+        ###################################################
         ###################################################
 
         ###################################################
+        ###################################################
         self.myFrame = Frame(self.root)
         self.myFrame.grid()
+        ###################################################
         ###################################################
 
         ###################################################
@@ -1182,7 +1235,16 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         self.root.title(self.GraphCanvasWindowTitle)
         self.root.protocol("WM_DELETE_WINDOW", self.ExitProgram_Callback)
         self.root.after(self.GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents, self.__GUI_update_clock)
-        self.root.geometry('%dx%d+%d+%d' % (self.GraphCanvasWidth, self.GraphCanvasHeight+20, self.GraphCanvasWindowStartingX, self.GraphCanvasWindowStartingY)) #+20 for debug_label
+
+        '''
+        The geometry() method accepts a string formatted as "WxH+X+Y":
+        W = width (optional)
+        H = height (optional)
+        X = x-coordinate (distance from the left of the screen)
+        Y = y-coordinate (distance from the top of the screen)
+        By omitting WxH, you preserve the window’s default or dynamically calculated size.
+        '''
+        self.root.geometry('%dx%d+%d+%d' % (self.GraphCanvasWidth, self.GraphCanvasHeight+50, self.GraphCanvasWindowStartingX, self.GraphCanvasWindowStartingY)) #+50 for Debug_Label
         ###################################################
         ###################################################
 
@@ -1194,7 +1256,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         ###################################################
         ###################################################
 
-        #################################################
+        ###################################################
+        ###################################################
         self.CanvasForDrawingGraph = Canvas(self.myFrame, width=self.GraphCanvasWidth, height=self.GraphCanvasHeight, bg="white")
         self.CanvasForDrawingGraph["highlightthickness"] = 0  # Remove light grey border around the Canvas
         self.CanvasForDrawingGraph["bd"] = 0 #Setting "bd", along with "highlightthickness" to 0 makes the Canvas be in the (0,0) pixel location instead of offset by those thicknesses
@@ -1205,37 +1268,189 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         What I most often do is set these attributes to zero. Then, if I actually want a border I'll put that canvas inside a frame and give the frame a border.
         '''
 
-        self.CanvasForDrawingGraph.grid(row=0, column=0)
-        #################################################
+        self.CanvasForDrawingGraph.bind("<Button-1>", lambda event: self.OnCanvasClickCallbackFunction(event))
+        self.CanvasForDrawingGraph.grid(row=0, column=0, padx=0, pady=0)
+        ###################################################
+        ###################################################
 
-        #################################################
-        self.debug_label = Label(self.myFrame, text="debug_label", width=100)
-        self.debug_label.grid(row=1, column=0, padx=0, pady=0, columnspan=1, rowspan=10)
-        #################################################
+        ###################################################
+        ###################################################
+        self.Debug_Label = Label(self.myFrame, text="Debug_Label", width=100)
+        self.Debug_Label.grid(row=1, column=0, padx=0, pady=0, columnspan=1, rowspan=1, sticky="w")
+        ###################################################
+        ###################################################
 
-        #################################################
+        ###################################################
+        ###################################################
+        self.PlotControlsFrame = Frame(self.myFrame, bg="white")
+        self.PlotControlsFrame.grid(row=2, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+        ###################################################
+        ###################################################
+
+        self.ButtonWidth = 15
+
+        ###################################################
+        ###################################################
+        self.ToggleAutoscale_Button = Button(self.PlotControlsFrame, text='Toggle Autoscale', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.ToggleAutoscale_ButtonResponse())
+        self.ToggleAutoscale_Button.grid(row=0, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+        ###################################################
+        ###################################################
+        
+        ###################################################
+        ###################################################
+        self.FreezePlot_Button = Button(self.PlotControlsFrame, text='Freeze Plot', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.FreezePlot_ButtonResponse())
+        self.FreezePlot_Button.grid(row=0, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
+        ###################################################
+        ###################################################
+        
+        ###################################################
+        ###################################################
+        self.SavePlot_Button = Button(self.PlotControlsFrame, text='Save Plot', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.SavePlot_ButtonResponse())
+        self.SavePlot_Button.grid(row=0, column=2, padx=1, pady=1, columnspan=1, rowspan=1)
+        ###################################################
+        ###################################################
+
+        ###################################################
+        ###################################################
+        self.Y_min_label = Label(self.PlotControlsFrame, text="Y_min", width=15, bg="white")
+        self.Y_min_label.grid(row=0, column=3, padx=1, pady=1, columnspan=1, rowspan=1)
+
+        self.Y_min_StringVar = StringVar()
+        self.Y_min_StringVar.set(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_min, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces))
+        self.Y_min_Entry = Entry(self.PlotControlsFrame, width=15, state="normal", textvariable=self.Y_min_StringVar)
+        self.Y_min_Entry.grid(row=0, column=4, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.Y_min_Entry.bind('<Return>', lambda event: self.Y_min_Entry_Response(event))
+        ###################################################
+        ###################################################
+
+        ###################################################
+        ###################################################
+        self.Y_max_label = Label(self.PlotControlsFrame, text="Y_max", width=15, bg="white")
+        self.Y_max_label.grid(row=0, column=5, padx=1, pady=1, columnspan=1, rowspan=1)
+
+        self.Y_max_StringVar = StringVar()
+        self.Y_max_StringVar.set(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_max, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces))
+        self.Y_max_Entry = Entry(self.PlotControlsFrame, width=15, state="normal", textvariable=self.Y_max_StringVar)
+        self.Y_max_Entry.grid(row=0, column=6, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.Y_max_Entry.bind('<Return>', lambda event: self.Y_max_Entry_Response(event))
+        ###################################################
+        ###################################################
+
+        ###################################################
+        ###################################################
         self.PrintToGui_Label = Label(self.myFrame, text="PrintToGui_Label", width=100)
         if self.EnableInternal_MyPrint_Flag == 1:
             self.PrintToGui_Label.grid(row=0, column=3, padx=0, pady=0, columnspan=1, rowspan=10)
-        #################################################
+        ###################################################
+        ###################################################
 
-        #################################################
+        ###################################################
+        ###################################################
         self.myFrame["bg"] = "white"
-        self.debug_label["bg"] = "white"
+        self.Debug_Label["bg"] = "white"
         self.PrintToGui_Label["bg"] = "white"
-        #################################################
+        ###################################################
+        ###################################################
 
-        #################################################
-        #################################################
-        #################################################
+        ###################################################
+        ###################################################
+        self.StartingTime_CalculatedFromGUIthread = self.getPreciseSecondsTimeStampString()
 
         self.GUI_ready_to_be_updated_flag = 1
 
         self.root.mainloop() #THIS MUST BE THE LAST LINE IN THE GUI THREAD SETUP BECAUSE IT'S BLOCKING!!!!
+        ###################################################
+        ###################################################
 
-        #self.root.quit()  # Stop the GUI thread. This is the normal call we'd make for a multithreaded application, but it doesn't work when we're doing a stand-along process!
-        #self.root.destroy()  # Close down the GUI thread, MUST BE CALLED FROM GUI_Thread. This is the normal call we'd make for a multithreaded application, but it doesn't work when we're doing a stand-along process!
+        #################################################
+        #################################################
+        #################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def ToggleAutoscale_ButtonResponse(self):
+
+        if self.YaxisAutoscaleFlag == 1:
+            self.YaxisAutoscaleFlag = 0
+        else:
+            self.YaxisAutoscaleFlag = 1
+
+        print("ToggleAutoscale_ButtonResponse event fired!")
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def FreezePlot_ButtonResponse(self):
+
+        if self.FreezePlotFlag == 1:
+            self.FreezePlotFlag = 0
+        else:
+            self.FreezePlotFlag = 1
+
+        print("FreezePlot_ButtonResponse event fired!")
+
+    ##########################################################################################################
+    ##########################################################################################################
+    
+    ##########################################################################################################
+    ##########################################################################################################
+    def SavePlot_ButtonResponse(self):
+
+        if self.SavePlotFlag == 1:
+            self.SavePlotFlag = 0
+        else:
+            self.SavePlotFlag = 1
+
+        print("SavePlot_ButtonResponse event fired!")
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def Y_min_Entry_Response(self, event):
+
+        try:
+            temp = float(self.Y_min_StringVar.get())
+
+            self.Y_min = temp
+
+            print("Y_min_Entry_Response: self.Y_min = " + str(self.Y_min))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("Y_min_Entry_Response, exceptions: %s" % exceptions)
+            traceback.print_exc()
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def Y_max_Entry_Response(self, event):
+
+        try:
+            temp = float(self.Y_max_StringVar.get())
+
+            self.Y_max = temp
+
+            print("Y_max_Entry_Response: self.Y_max = " + str(self.Y_max))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("Y_max_Entry_Response, exceptions: %s" % exceptions)
+            traceback.print_exc()
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def OnCanvasClickCallbackFunction(self, event):
+        print("[" + str(event.x) + ", "  + str(event.y) + "]")
     ##########################################################################################################
     ##########################################################################################################
 
@@ -1475,73 +1690,183 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     ##########################################################################################################
 
     ##########################################################################################################
-    ##########################################################################################################  def GUI
+    ##########################################################################################################
+    def CreateNewDirectoryIfItDoesntExist(self, directory):
+        try:
+            #print("CreateNewDirectoryIfItDoesntExist, directory: " + directory)
+            if os.path.isdir(directory) == 0: #No directory with this name exists
+                os.makedirs(directory)
+
+            return 1
+        except:
+            exceptions = sys.exc_info()[0]
+            print("CreateNewDirectoryIfItDoesntExist, Exceptions: %s" % exceptions)
+            return 0
+            #traceback.print_exc()
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ########################################################################################################## def GUI
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     def __GUI_update_clock(self): #THIS FUNCTION NEEDS TO BE CALLED INTERNALLY BY THE CLASS, NOT EXTERNALLY LIKE WE NORMALLY DO BECAUSE WE'RE FIRING THESE ROOT.AFTER CALLBACKS FASTER THAN THE PARENT ROOT GUI
 
         if self.EXIT_PROGRAM_FLAG == 0:
 
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
             if self.GUI_ready_to_be_updated_flag == 1:
 
-                #######################################################
-                self.CurrentTime_CalculatedFromGUIthread = self.getPreciseSecondsTimeStampString()
-                #print("self.CurrentTime_CalculatedFromGUIthread: " + str(self.CurrentTime_CalculatedFromGUIthread ))
-                #######################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                self.CurrentTime_CalculatedFromGUIthread = self.getPreciseSecondsTimeStampString() - self.StartingTime_CalculatedFromGUIthread
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
 
-                #######################################################
-                self.CanvasForDrawingGraph.delete(u'all')
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.FreezePlotFlag == 0:
+                    
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    self.CanvasForDrawingGraph.delete(u'all')
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    
+                    ########################################################################################################## 
+                    ##########################################################################################################
+                    temp_CurvesToPlotDictOfDicts = dict(self.CurvesToPlotDictOfDicts) #Make local copy so that adding new points from external program won't change anything mid-plotting.
+                    
+                    temp_X_min = float(self.X_min)
+                    temp_X_max = float(self.X_max)
+                    temp_Y_min = float(self.Y_min)
+                    temp_Y_max = float(self.Y_max)
 
-                #################  #Make local copy so that adding new points from external program won't change anything mid-plotting.
-                temp_CurvesToPlotDictOfDicts = dict(self.CurvesToPlotDictOfDicts)
-                temp_X_min = float(self.X_min)
-                temp_X_max = float(self.X_max)
-                temp_Y_min = float(self.Y_min)
-                temp_Y_max = float(self.Y_max)
-                #################
+                    [self.X_min, self.X_max, self.Y_min, self.Y_max] = self.UpdateNewXandYlimits(temp_CurvesToPlotDictOfDicts, temp_X_min, temp_X_max, temp_Y_min, temp_Y_max)
 
-                [self.X_min, self.X_max, self.Y_min, self.Y_max] = self.UpdateNewXandYlimits(temp_CurvesToPlotDictOfDicts, temp_X_min, temp_X_max, temp_Y_min, temp_Y_max) #temp_X_min, temp_X_max, temp_Y_min, temp_Y_max
+                    temp_X_min = float(self.X_min)
+                    temp_X_max = float(self.X_max)
+                    temp_Y_min = float(self.Y_min)
+                    temp_Y_max = float(self.Y_max)
+                    ##########################################################################################################
+                    ##########################################################################################################
 
-                #print("self.Y_max: " + str(self.Y_max))
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    self.DrawAxes(temp_CurvesToPlotDictOfDicts, temp_X_min, temp_X_max, temp_Y_min, temp_Y_max)
+                    self.DrawAllPoints_MathCoord(temp_CurvesToPlotDictOfDicts, DrawLinesBetweenPointsFlag = 0)
+                    ##########################################################################################################
+                    ##########################################################################################################
 
-                temp_X_min = float(self.X_min)
-                temp_X_max = float(self.X_max)
-                temp_Y_min = float(self.Y_min)
-                temp_Y_max = float(self.Y_max)
+                    ########################################################################################################## TEST AREA FOR PLOTTING KNOWN POINTS
+                    ##########################################################################################################
+                    '''
+                    self.DrawOnePoint_MathCoord([self.X_min, self.Y_min], "Green")
+                    self.DrawOnePoint_MathCoord([self.X_min, self.Y_max], "Green")
+                    self.DrawOnePoint_MathCoord([self.X_max, self.Y_min], "Green")
+                    self.DrawOnePoint_MathCoord([self.X_max, self.Y_max], "Green")
+                    '''
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
 
-                self.DrawAxes(temp_CurvesToPlotDictOfDicts, temp_X_min, temp_X_max, temp_Y_min, temp_Y_max) #self.X_min, self.X_max, self.Y_min, self.Y_max
-
-                self.DrawAllPoints_MathCoord(temp_CurvesToPlotDictOfDicts, DrawLinesBetweenPointsFlag = 0)
-                #######################################################
-
-                ####################################################### TEST AREA FOR PLOTTING KNOWN POINTS
-                '''
-                self.DrawOnePoint_MathCoord([self.X_min, self.Y_min], "Green")
-                self.DrawOnePoint_MathCoord([self.X_min, self.Y_max], "Green")
-                self.DrawOnePoint_MathCoord([self.X_max, self.Y_min], "Green")
-                self.DrawOnePoint_MathCoord([self.X_max, self.Y_max], "Green")
-                '''
-                #######################################################
-
-                #######################################################
-                self.debug_label["text"] = "ParentPID = " + str(self.ParentPID) + \
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                self.Debug_Label["text"] = "ParentPID = " + str(self.ParentPID) + \
                                            ", PlottingPID = " + str(os.getpid()) + \
-                                           ", GUI Time: " + str(self.CurrentTime_CalculatedFromGUIthread) +\
-                                            ", GUI Frequency: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.LoopFrequency_CalculatedFromGUIthread, 0, 3)
-                #######################################################
+                                           ", GUI Time: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.CurrentTime_CalculatedFromGUIthread, 0, 1) +\
+                                           ", GUI Frequency: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.LoopFrequency_CalculatedFromGUIthread, 0, 3)
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
 
-                #######################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.YaxisAutoscaleFlag == 1:
+
+                    #######################################################
+                    self.Y_min_StringVar.set(float(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_min, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces)))
+                    #######################################################
+
+                    #######################################################
+                    self.Y_max_StringVar.set(float(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_max, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces)))
+                    #######################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
                 self.PrintToGui_Label.config(text=self.PrintToGui_Label_TextInput_Str)
-                #######################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
 
-                #######################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
                 self.UpdateFrequencyCalculation_CalculatedFromGUIthread()
-                #######################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
 
-                #time.sleep(0.001)
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.SavePlotFlag == 1:
 
-            #######################################################
-            self.root.after(self.GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents, self.__GUI_update_clock)
-            #######################################################
+                    if self.pyautogui_ModuleImportedFlag == 1:
 
+                        self.SavedImages_FullDirectoryPath = os.getcwd() + "//SavedImages"
+
+                        self.CreateNewDirectoryIfItDoesntExist(self.SavedImages_FullDirectoryPath)
+
+                        #self.CanvasForDrawingGraph.postscript(file="canvas_output.ps")
+
+
+                        x = self.CanvasForDrawingGraph.winfo_rootx()
+                        y = self.CanvasForDrawingGraph.winfo_rooty()
+                        w = self.CanvasForDrawingGraph.winfo_width()
+                        h = self.CanvasForDrawingGraph.winfo_height()
+
+                        screenshot = pyautogui.screenshot(region=(x, y, w, h))
+                        screenshot.save(self.SavedImages_FullDirectoryPath + "//MyPlot_" + str(self.getTimeStampString()) + ".png")
+
+                    self.SavePlotFlag = 0
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                self.root.after(self.GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents, self.__GUI_update_clock)
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
 
