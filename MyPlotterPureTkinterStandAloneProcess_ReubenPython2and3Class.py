@@ -6,9 +6,9 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision U, 06/27/2025
+Software Revision V, 07/14/2025
 
-Verified working on: Python 3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
+Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
 "multiprocessing.set_start_method('spawn', force=True)" ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 '''
@@ -40,6 +40,7 @@ try:
 except:
     pyautogui_ModuleImportedFlag = 0
     print("Error: the module 'pyautogui' cvould not be imported.")
+    
 #########################################################
 
 #########################################################
@@ -359,6 +360,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.X_min = 0.0
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: X_min: " + str(self.X_min))
+        
+        self.X_min_StoredFromProcessVariablesThatCanBeLiveUpdated = self.X_min
         ##########################################
         ##########################################
 
@@ -370,6 +373,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.X_max = 10.0
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: X_max: " + str(self.X_max))
+        
+        self.X_max_StoredFromProcessVariablesThatCanBeLiveUpdated = self.X_max
         ##########################################
         ##########################################
 
@@ -381,6 +386,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.Y_min = -10.0
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Y_min: " + str(self.Y_min))
+        
+        self.Y_min_StoredFromProcessVariablesThatCanBeLiveUpdated = self.Y_min
         ##########################################
         ##########################################
 
@@ -392,6 +399,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.Y_max = 10.0
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Y_max: " + str(self.Y_max))
+        
+        self.Y_max_StoredFromProcessVariablesThatCanBeLiveUpdated = self.Y_max
         ##########################################
         ##########################################
 
@@ -581,6 +590,17 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: GraphNumberOfDecimalPlaces: " + str(self.GraphNumberOfDecimalPlaces))
         ##########################################
         ##########################################
+        
+        ##########################################
+        ##########################################
+        if "SavePlot_DirectoryPath" in setup_dict:
+            self.SavePlot_DirectoryPath = str(setup_dict["SavePlot_DirectoryPath"])
+        else:
+            self.SavePlot_DirectoryPath = os.path.join(os.getcwd(), "SavedImages")
+
+        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: SavePlot_DirectoryPath: " + str(self.SavePlot_DirectoryPath))
+        ##########################################
+        ##########################################
 
     ##########################################################################################################
     ##########################################################################################################
@@ -655,6 +675,18 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
                             if "EndStandAloneProcessFlag" in inputDict:
                                 self.EXIT_PROGRAM_FLAG = 1
+                               
+                            if "ToggleAutoscale" in inputDict:
+                                self.ToggleAutoscale()
+                                
+                            if "ToggleFreezePlot" in inputDict:
+                                self.ToggleFreezePlot()
+                                
+                            if "SavePlot" in inputDict:
+                                self.SavePlotFlag = 1
+                                
+                            if "ResetMinAndMax" in inputDict:
+                                self.ResetMinAndMax()
 
                             else:
                                 if "CurveName" in inputDict:
@@ -1088,6 +1120,54 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     ##########################################################################################################
     ##########################################################################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
+    def SendToggleAutoscaleCommandToStandAloneProcess(self):
+
+        try:
+            self.MultiprocessingQueue_Rx.put(dict([("ToggleAutoscale", 1)]))
+        except:
+            pass
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SendToggleFreezePlotCommandToStandAloneProcess(self):
+
+        try:
+            self.MultiprocessingQueue_Rx.put(dict([("ToggleFreezePlot", 1)]))
+        except:
+            pass
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SendSavePlotCommandToStandAloneProcess(self):
+
+        try:
+            self.MultiprocessingQueue_Rx.put(dict([("SavePlot", 1)]))
+        except:
+            pass
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SendResetMinAndMaxCommandToStandAloneProcess(self):
+
+        try:
+            self.MultiprocessingQueue_Rx.put(dict([("ResetMinAndMax", 1)]))
+        except:
+            pass
+
+    ##########################################################################################################
+    ##########################################################################################################
+
     ########################################################################################################## unicorn
     ##########################################################################################################
     def ExternalAddPointOrListOfPointsToPlot(self, CurveNameStringList, XdataList, YdataList, OverrideCurveAndPointListsMustMatchInLengthFlag=0):
@@ -1298,8 +1378,8 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         
         ###################################################
         ###################################################
-        self.FreezePlot_Button = Button(self.PlotControlsFrame, text='Freeze Plot', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.FreezePlot_ButtonResponse())
-        self.FreezePlot_Button.grid(row=0, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.ToggleFreezePlot_Button = Button(self.PlotControlsFrame, text='Freeze Plot', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.ToggleFreezePlot_ButtonResponse())
+        self.ToggleFreezePlot_Button.grid(row=0, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
         ###################################################
         ###################################################
         
@@ -1333,6 +1413,13 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         self.Y_max_Entry = Entry(self.PlotControlsFrame, width=15, state="normal", textvariable=self.Y_max_StringVar)
         self.Y_max_Entry.grid(row=0, column=6, padx=1, pady=1, columnspan=1, rowspan=1)
         self.Y_max_Entry.bind('<Return>', lambda event: self.Y_max_Entry_Response(event))
+        ###################################################
+        ###################################################
+
+        ###################################################
+        ###################################################
+        self.ResetMinAndMax_Button = Button(self.PlotControlsFrame, text='ResetMinMax', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.ResetMinAndMax_ButtonResponse())
+        self.ResetMinAndMax_Button.grid(row=0, column=7, padx=1, pady=1, columnspan=1, rowspan=1)
         ###################################################
         ###################################################
 
@@ -1373,26 +1460,49 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     ##########################################################################################################
     def ToggleAutoscale_ButtonResponse(self):
 
+        self.ToggleAutoscale()
+
+        #print("ToggleAutoscale_ButtonResponse event fired!")
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def ToggleAutoscale(self):
+
         if self.YaxisAutoscaleFlag == 1:
             self.YaxisAutoscaleFlag = 0
+            
         else:
             self.YaxisAutoscaleFlag = 1
 
-        print("ToggleAutoscale_ButtonResponse event fired!")
+        #print("ToggleAutoscale event fired!")
 
     ##########################################################################################################
     ##########################################################################################################
 
     ##########################################################################################################
     ##########################################################################################################
-    def FreezePlot_ButtonResponse(self):
+    def ToggleFreezePlot_ButtonResponse(self):
+
+        self.ToggleFreezePlot()
+
+        #print("ToggleFreezePlot_ButtonResponse event fired!")
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def ToggleFreezePlot(self):
 
         if self.FreezePlotFlag == 1:
             self.FreezePlotFlag = 0
         else:
             self.FreezePlotFlag = 1
 
-        print("FreezePlot_ButtonResponse event fired!")
+        #print("ToggleFreezePlot event fired!")
 
     ##########################################################################################################
     ##########################################################################################################
@@ -1401,12 +1511,9 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
     ##########################################################################################################
     def SavePlot_ButtonResponse(self):
 
-        if self.SavePlotFlag == 1:
-            self.SavePlotFlag = 0
-        else:
-            self.SavePlotFlag = 1
+        self.SavePlotFlag = 1
 
-        print("SavePlot_ButtonResponse event fired!")
+        #print("SavePlot_ButtonResponse event fired!")
 
     ##########################################################################################################
     ##########################################################################################################
@@ -1449,7 +1556,41 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
     ##########################################################################################################
     ##########################################################################################################
+    def ResetMinAndMax_ButtonResponse(self):
+
+        self.ResetMinAndMax()
+
+        #print("ResetMinAndMax_ButtonResponse event fired!")
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def ResetMinAndMax(self):
+
+        self.X_min = self.X_min_StoredFromProcessVariablesThatCanBeLiveUpdated
+        self.X_max = self.X_max_StoredFromProcessVariablesThatCanBeLiveUpdated
+        self.Y_min = self.Y_min_StoredFromProcessVariablesThatCanBeLiveUpdated
+        self.Y_max = self.Y_max_StoredFromProcessVariablesThatCanBeLiveUpdated
+
+        #######################################################
+        self.Y_min_StringVar.set(float(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_min, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces)))
+        #######################################################
+
+        #######################################################
+        self.Y_max_StringVar.set(float(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_max, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces)))
+        #######################################################
+
+        #print("ResetMinAndMax_ButtonResponse event fired!")
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     def OnCanvasClickCallbackFunction(self, event):
+        self.ToggleFreezePlot()
         print("[" + str(event.x) + ", "  + str(event.y) + "]")
     ##########################################################################################################
     ##########################################################################################################
@@ -1794,8 +1935,31 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
+                self.ToggleAutoscale_Button["text"] = "Autoscale: " + str(self.YaxisAutoscaleFlag)
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
                 if self.YaxisAutoscaleFlag == 1:
 
+                    #######################################################
+                    if self.Y_min_Entry["state"] != "disabled":
+                        self.Y_min_Entry["state"] = "disabled"
+                    #######################################################
+                    
+                    #######################################################
+                    if self.Y_max_Entry["state"] != "disabled":
+                        self.Y_max_Entry["state"] = "disabled"
+                    #######################################################
+                    
+                    #######################################################
+                    if self.ResetMinAndMax_Button["state"] != "disabled":
+                        self.ResetMinAndMax_Button["state"] = "disabled"
+                    #######################################################
+                    
                     #######################################################
                     self.Y_min_StringVar.set(float(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_min, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces)))
                     #######################################################
@@ -1807,6 +1971,30 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                else:
+                    #######################################################
+                    if self.Y_min_Entry["state"] != "normal":
+                        self.Y_min_Entry["state"] = "normal"
+                    #######################################################
+                    
+                    #######################################################
+                    if self.Y_max_Entry["state"] != "normal":
+                        self.Y_max_Entry["state"] = "normal"
+                    #######################################################
+                    
+                    #######################################################
+                    if self.ResetMinAndMax_Button["state"] != "normal":
+                        self.ResetMinAndMax_Button["state"] = "normal"
+                    #######################################################
+                    
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                
 
                 ##########################################################################################################
                 ##########################################################################################################
@@ -1831,21 +2019,28 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
                     if self.pyautogui_ModuleImportedFlag == 1:
 
-                        self.SavedImages_FullDirectoryPath = os.getcwd() + "//SavedImages"
+                        try:
 
-                        self.CreateNewDirectoryIfItDoesntExist(self.SavedImages_FullDirectoryPath)
+                            self.CreateNewDirectoryIfItDoesntExist(self.SavePlot_DirectoryPath)
 
-                        #self.CanvasForDrawingGraph.postscript(file="canvas_output.ps")
+                            self.ImageFilenameFullDirectoryPathWithExtension = self.SavePlot_DirectoryPath + "//MyPlot_" + str(self.getTimeStampString()) + ".png"
+                            print("Saving screenshot: " + self.ImageFilenameFullDirectoryPathWithExtension)
+                            
+                            #self.CanvasForDrawingGraph.postscript(file="canvas_output.ps")
 
+                            x = self.CanvasForDrawingGraph.winfo_rootx()
+                            y = self.CanvasForDrawingGraph.winfo_rooty()
+                            w = self.CanvasForDrawingGraph.winfo_width()
+                            h = self.CanvasForDrawingGraph.winfo_height()
 
-                        x = self.CanvasForDrawingGraph.winfo_rootx()
-                        y = self.CanvasForDrawingGraph.winfo_rooty()
-                        w = self.CanvasForDrawingGraph.winfo_width()
-                        h = self.CanvasForDrawingGraph.winfo_height()
-
-                        screenshot = pyautogui.screenshot(region=(x, y, w, h))
-                        screenshot.save(self.SavedImages_FullDirectoryPath + "//MyPlot_" + str(self.getTimeStampString()) + ".png")
-
+                            screenshot = pyautogui.screenshot(region=(x, y, w, h))
+                            screenshot.save(self.ImageFilenameFullDirectoryPathWithExtension)
+                            
+                        except:
+                            exceptions = sys.exc_info()[0]
+                            print("MyPlotterPureTkinterStandAloneProcess, SavePlotFlag, exceptions: %s" % exceptions)
+                            traceback.print_exc()
+            
                     self.SavePlotFlag = 0
                 ##########################################################################################################
                 ##########################################################################################################

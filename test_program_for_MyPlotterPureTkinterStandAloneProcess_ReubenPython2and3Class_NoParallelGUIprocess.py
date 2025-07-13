@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision U, 06/27/2025
+Software Revision V, 07/14/2025
 
-Verified working on: Python 3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
+Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
 "multiprocessing.set_start_method('spawn')" ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 '''
@@ -31,6 +31,8 @@ import math
 import traceback
 import re
 import keyboard
+import random
+from random import randint
 #########################################################
 
 #########################################################
@@ -51,6 +53,116 @@ if platform.system() == "Windows":
     winmm = ctypes.WinDLL('winmm')
     winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
 #########################################################
+
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformTypeString="Sine"):
+    
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        try:
+
+            ##########################################################################################################
+            ##########################################################################################################
+            OutputValue = 0.0
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            WaveformTypeString_ListOfAcceptableValues = ["Sine", "Cosine", "Triangular", "Square"]
+        
+            if WaveformTypeString not in WaveformTypeString_ListOfAcceptableValues:
+                print("GetLatestWaveformValue: Error, WaveformTypeString must be in " + str(WaveformTypeString_ListOfAcceptableValues))
+                return -11111.0
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            if WaveformTypeString == "Sine":
+    
+                TimeGain = math.pi/Period
+                OutputValue = (MaxValue + MinValue)/2.0 + 0.5*abs(MaxValue - MinValue)*math.sin(TimeGain*CurrentTime)
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            elif WaveformTypeString == "Cosine":
+    
+                TimeGain = math.pi/Period
+                OutputValue = (MaxValue + MinValue)/2.0 + 0.5*abs(MaxValue - MinValue)*math.cos(TimeGain*CurrentTime)
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            elif WaveformTypeString == "Triangular":
+                TriangularInput_TimeGain = 1.0
+                TriangularInput_MinValue = -5
+                TriangularInput_MaxValue = 5.0
+                TriangularInput_PeriodInSeconds = 2.0
+        
+                #TriangularInput_Height0toPeak = abs(TriangularInput_MaxValue - TriangularInput_MinValue)
+                #TriangularInput_CalculatedValue_1 = abs((TriangularInput_TimeGain*CurrentTime_CalculatedFromMainThread % PeriodicInput_PeriodInSeconds) - TriangularInput_Height0toPeak) + TriangularInput_MinValue
+        
+                A = abs(MaxValue - MinValue)
+                P = Period
+    
+                #https://stackoverflow.com/questions/1073606/is-there-a-one-line-function-that-generates-a-triangle-wave
+                OutputValue = (A / (P / 2)) * ((P / 2) - abs(CurrentTime % (2 * (P / 2)) - P / 2)) + MinValue
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            elif WaveformTypeString == "Square":
+    
+                TimeGain = math.pi/Period
+                MeanValue = (MaxValue + MinValue)/2.0
+                SinusoidalValue =  MeanValue + 0.5*abs(MaxValue - MinValue)*math.sin(TimeGain*CurrentTime)
+                
+                if SinusoidalValue >= MeanValue:
+                    OutputValue = MaxValue
+                else:
+                    OutputValue = MinValue
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            else:
+                OutputValue = 0.0
+            ##########################################################################################################
+            ##########################################################################################################
+            
+            return OutputValue
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        except:
+            exceptions = sys.exc_info()[0]
+            print("GetLatestWaveformValue: Exceptions: %s" % exceptions)
+            return -11111.0
+            traceback.print_exc()
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
 
 ##########################################################################################################
 ##########################################################################################################
@@ -74,10 +186,18 @@ def ExitProgram_Callback(OptionalArugment = 0):
 
 ##########################################################################################################
 ##########################################################################################################
+##########################################################################################################
+##########################################################################################################
 if __name__ == '__main__':
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    random.seed() #For random-number-generation
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     global my_platform
 
     if platform.system() == "Linux":
@@ -97,56 +217,86 @@ if __name__ == '__main__':
         my_platform = "other"
 
     print("The OS platform is: " + my_platform)
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    ################################################
-    ################################################
+    ##########################################################################################################
+    ##########################################################################################################
     global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
     USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
     
     global USE_KEYBOARD_FLAG
     USE_KEYBOARD_FLAG = 1
-    
-    global USE_SINUSOIDAL_TEST_FLAG
-    USE_SINUSOIDAL_TEST_FLAG = 1
-    ################################################
-    ################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    ################################################
-    ################################################
+    ##########################################################################################################
+    ##########################################################################################################
     global SHOW_IN_GUI_MyPlotterPureTkinterStandAloneProcess_FLAG
     SHOW_IN_GUI_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
-    ################################################
-    ################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
     global EXIT_PROGRAM_FLAG
     EXIT_PROGRAM_FLAG = 0
 
     global GUI_RootAfterCallbackInterval_Milliseconds
     GUI_RootAfterCallbackInterval_Milliseconds = 30
 
-    global CurrentTime_MainLoopThread
-    CurrentTime_MainLoopThread = -11111.0
+    global CurrentTime_CalculatedFromMainThread
+    CurrentTime_CalculatedFromMainThread = -11111.0
 
-    global StartingTime_MainLoopThread
-    StartingTime_MainLoopThread = -11111.0
+    global StartingTime_CalculatedFromMainThread
+    StartingTime_CalculatedFromMainThread = -11111.0
 
-    global SinusoidalMotionInput_ROMtestTimeToPeakAngle
-    SinusoidalMotionInput_ROMtestTimeToPeakAngle = 2.0
+    global PeriodicInput_AcceptableValues
+    PeriodicInput_AcceptableValues = ["GUI", "VINThub", "Sine", "Cosine", "Triangular", "Square"]
 
-    global SinusoidalMotionInput_MinValue
-    SinusoidalMotionInput_MinValue = -50
+    global PeriodicInput_Type_1
+    PeriodicInput_Type_1 = "Sine"
 
-    global SinusoidalMotionInput_MaxValue
-    SinusoidalMotionInput_MaxValue = 50
-    #################################################
-    #################################################
+    global PeriodicInput_MinValue_1
+    PeriodicInput_MinValue_1 = -1.0
 
-    #################################################
-    #################################################
+    global PeriodicInput_MaxValue_1
+    PeriodicInput_MaxValue_1 = 1.0
+
+    global PeriodicInput_Period_1
+    PeriodicInput_Period_1 = 1.0
+
+    global PeriodicInput_CalculatedValue_1
+    PeriodicInput_CalculatedValue_1 = 0.0
+
+    global PeriodicInput_Type_2
+    PeriodicInput_Type_2 = "Sine"
+
+    global PeriodicInput_MinValue_2
+    PeriodicInput_MinValue_2 = -1.0
+
+    global PeriodicInput_MaxValue_2
+    PeriodicInput_MaxValue_2 = 1.0
+
+    global PeriodicInput_Period_2
+    PeriodicInput_Period_2 = 1.0
+
+    global PeriodicInput_CalculatedValue_2
+    PeriodicInput_CalculatedValue_2 = 0.0
+    
+    global NoiseCounter
+    NoiseCounter = 0
+
+    global NoiseCounter_FireEveryNth
+    NoiseCounter_FireEveryNth = 5
+
+    global NoiseAmplitude_Percent0to1OfPeriodicInputAmplitude
+    NoiseAmplitude_Percent0to1OfPeriodicInputAmplitude = 0.25
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
 
     global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
@@ -158,13 +308,13 @@ if __name__ == '__main__':
     global MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
     MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
 
-    global LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess
-    LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = -11111.0
-    #################################################
-    #################################################
+    global LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess
+    LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess = -11111.0
+    ##########################################################################################################
+    ##########################################################################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
                                                                                                 ("NumberOfPrintLines", 10),
@@ -199,7 +349,8 @@ if __name__ == '__main__':
                                                                                         ("XaxisDrawnAtBottomOfGraph", 0),
                                                                                         ("XaxisLabelString", "Time (sec)"),
                                                                                         ("YaxisLabelString", "Y-units (units)"),
-                                                                                        ("ShowLegendFlag", 1)])
+                                                                                        ("ShowLegendFlag", 1),
+                                                                                        ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder"))])
     
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
@@ -210,63 +361,88 @@ if __name__ == '__main__':
             exceptions = sys.exc_info()[0]
             print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject, exceptions: %s" % exceptions)
             #traceback.print_exc()
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1:
         if EXIT_PROGRAM_FLAG == 0:
             if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
                 print("Failed to open MyPlotterPureTkinterClass_Object.")
                 ExitProgram_Callback()
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
     if USE_KEYBOARD_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         keyboard.on_press_key("esc", ExitProgram_Callback)
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
     if EXIT_PROGRAM_FLAG == 0:
-        StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
-    #################################################
-    #################################################
+        print("$$$$$$$$$$$$$$ STARTING MAIN LOOP $$$$$$$$$$$$$$")
+        StartingTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString()
+    ##########################################################################################################
+    ##########################################################################################################
 
-    #################################################
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     while(EXIT_PROGRAM_FLAG == 0):
 
-        #################################################
-        #################################################
-        CurrentTime_MainLoopThread = getPreciseSecondsTimeStampString() - StartingTime_MainLoopThread
+        ##########################################################################################################
+        ##########################################################################################################
+        CurrentTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString() - StartingTime_CalculatedFromMainThread
 
-        if CurrentTime_MainLoopThread > 10.0:
+        if CurrentTime_CalculatedFromMainThread > 30.0:
             ExitProgram_Callback()
-        #################################################
-        #################################################
+        ##########################################################################################################
+        ##########################################################################################################
 
-        #################################################
-        #################################################
-        if USE_SINUSOIDAL_TEST_FLAG == 1:
+        ######################################################################################################
+        ######################################################################################################
+        AmplitudeScalar = GetLatestWaveformValue(CurrentTime_CalculatedFromMainThread, 
+                                                                1.0, 
+                                                                10.0, 
+                                                                PeriodicInput_Period_1, 
+                                                                PeriodicInput_Type_1)
+                                                                
+        PeriodicInput_CalculatedValue_1 = GetLatestWaveformValue(CurrentTime_CalculatedFromMainThread, 
+                                                                AmplitudeScalar*PeriodicInput_MinValue_1, 
+                                                                AmplitudeScalar*PeriodicInput_MaxValue_1, 
+                                                                PeriodicInput_Period_1, 
+                                                                PeriodicInput_Type_1)
+        ######################################################################################################
+        ######################################################################################################
 
-            TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
-            DesiredAngleDeg_1 = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.1*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.sin(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
-            DesiredAngleDeg_2 = 0.5*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.05*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.cos(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
-            DesiredAngleDeg_3 = 0.25*(SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue) + math.exp(0.03*CurrentTime_MainLoopThread)*0.5 * abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue) * math.tan(TimeGain * CurrentTime_MainLoopThread)  # AUTOMATIC SINUSOIDAL MOVEMENT
-        #################################################
-        #################################################
+        ######################################################################################################
+        ######################################################################################################
 
-        ################################################# SET's
-        #################################################
+        ######################################################################################################
+        PeriodicInput_CalculatedValue_2 = PeriodicInput_CalculatedValue_1*2.0 + 3.0
+        ######################################################################################################
+
+        ######################################################################################################
+        NoiseCounter = NoiseCounter + 1
+        if NoiseCounter == NoiseCounter_FireEveryNth:
+            NoiseAmplitude = NoiseAmplitude_Percent0to1OfPeriodicInputAmplitude * abs(PeriodicInput_MaxValue_1 - PeriodicInput_MinValue_1)
+            NoiseValue = random.uniform(-1.0 * NoiseAmplitude, NoiseAmplitude)
+            PeriodicInput_CalculatedValue_2 = PeriodicInput_CalculatedValue_2 + NoiseValue
+            NoiseCounter = 0
+        ######################################################################################################
+        
+        ######################################################################################################
+        ######################################################################################################
+
+        ########################################################################################################### SET's
+        ##########################################################################################################
         if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
 
-            #################################################
+            ##########################################################################################################
             try:
 
                 MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
@@ -275,43 +451,43 @@ if __name__ == '__main__':
                     MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
 
                     if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
-                        if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.040:
+                        if CurrentTime_CalculatedFromMainThread - LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess >= 0.040:
                             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["PlotCurve1",
-                                                                                                                                     "PlotCurve2",
-                                                                                                                                     "PlotCurve3"],
-                                                                                                                                    [CurrentTime_MainLoopThread]*3,
-                                                                                                                                    [DesiredAngleDeg_1,
-                                                                                                                                     DesiredAngleDeg_2,
-                                                                                                                                     DesiredAngleDeg_3])
+                                                                                                                                     "PlotCurve2"],
+                                                                                                                                    [CurrentTime_CalculatedFromMainThread]*2,
+                                                                                                                                    [PeriodicInput_CalculatedValue_1,
+                                                                                                                                    PeriodicInput_CalculatedValue_2])
 
-                            LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_MainLoopThread
-            #################################################
+                            LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_CalculatedFromMainThread
+            ##########################################################################################################
 
-            ####################################################
+            ##########################################################################################################
             except:
                 exceptions = sys.exc_info()[0]
                 print("MyPlotterPureTkinterStandAloneProcess, exceptions: %s" % exceptions)
                 traceback.print_exc()
-            ####################################################
+            ##########################################################################################################
 
-        #################################################
-        #################################################
+        #########################################################################################################
+        ##########################################################################################################
 
-    #################################################
-    #################################################
-    #################################################
+    #########################################################################################################
+    #########################################################################################################
+    #########################################################################################################
 
-    ################################################# THIS IS THE EXIT ROUTINE!
-    #################################################
+    ######################################################################################################### THIS IS THE EXIT ROUTINE!
+    #########################################################################################################
     print("MAIN LEADER PROGRAM Exiting main program 'test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.")
 
-    #################################################
+    #########################################################################################################
     if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
         MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
-    #################################################
+    #########################################################################################################
 
-    #################################################
-    #################################################
+    #########################################################################################################
+    #########################################################################################################
 
+##########################################################################################################
+##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
