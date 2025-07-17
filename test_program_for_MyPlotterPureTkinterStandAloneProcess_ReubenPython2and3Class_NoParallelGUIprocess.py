@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision V, 07/14/2025
+Software Revision W, 07/16/2025
 
 Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -33,6 +33,7 @@ import re
 import keyboard
 import random
 from random import randint
+import signal #for CTRLc_HandlerFunction
 #########################################################
 
 #########################################################
@@ -54,6 +55,25 @@ if platform.system() == "Windows":
     winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
 #########################################################
 
+##########################################################################################################
+##########################################################################################################
+def CTRLc_RegisterHandlerFunction():
+
+    signal.signal(signal.SIGINT, CTRLc_HandlerFunction)
+
+##########################################################################################################
+##########################################################################################################
+
+########################################################################################################## MUST ISSUE CTRLc_RegisterHandlerFunction() AT START OF PROGRAM
+##########################################################################################################
+def CTRLc_HandlerFunction(signum, frame):
+
+    print("CTRLc_HandlerFunction event firing!")
+
+    ExitProgram_Callback()
+
+##########################################################################################################
+##########################################################################################################
 
 ##########################################################################################################
 ##########################################################################################################
@@ -192,6 +212,15 @@ if __name__ == '__main__':
 
     ##########################################################################################################
     ##########################################################################################################
+    global EXIT_PROGRAM_FLAG
+    EXIT_PROGRAM_FLAG = 0
+
+    CTRLc_RegisterHandlerFunction()
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     random.seed() #For random-number-generation
     ##########################################################################################################
     ##########################################################################################################
@@ -239,9 +268,6 @@ if __name__ == '__main__':
 
     ##########################################################################################################
     ##########################################################################################################
-    global EXIT_PROGRAM_FLAG
-    EXIT_PROGRAM_FLAG = 0
-
     global GUI_RootAfterCallbackInterval_Milliseconds
     GUI_RootAfterCallbackInterval_Milliseconds = 30
 
@@ -250,6 +276,12 @@ if __name__ == '__main__':
 
     global StartingTime_CalculatedFromMainThread
     StartingTime_CalculatedFromMainThread = -11111.0
+
+    global LoopCounter_CalculatedFromMainThread
+    LoopCounter_CalculatedFromMainThread = 0
+
+    global MoveGraphPositionCounter
+    MoveGraphPositionCounter = 0
 
     global PeriodicInput_AcceptableValues
     PeriodicInput_AcceptableValues = ["GUI", "VINThub", "Sine", "Cosine", "Triangular", "Square"]
@@ -264,7 +296,7 @@ if __name__ == '__main__':
     PeriodicInput_MaxValue_1 = 1.0
 
     global PeriodicInput_Period_1
-    PeriodicInput_Period_1 = 1.0
+    PeriodicInput_Period_1 = 0.5
 
     global PeriodicInput_CalculatedValue_1
     PeriodicInput_CalculatedValue_1 = 0.0
@@ -315,46 +347,48 @@ if __name__ == '__main__':
 
     ##########################################################################################################
     ##########################################################################################################
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
-                                                                                                ("NumberOfPrintLines", 10),
-                                                                                                ("GraphCanvasWidth", 1280),
-                                                                                                ("GraphCanvasHeight", 700),
-                                                                                                ("GraphCanvasWindowStartingX", 0),
-                                                                                                ("GraphCanvasWindowStartingY", 0),
-                                                                                                ("GraphCanvasWindowTitle", "My plotting example!"),
-                                                                                                ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 20)])
-    
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
-                                                                                        ("ParentPID", os.getpid()),
-                                                                                        ("WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess", 5.0),
-                                                                                        ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PlotCurve1", "PlotCurve2", "PlotCurve3"]),
-                                                                                                                                    ("MarkerSizeList", [3, 2, 1]),
-                                                                                                                                    ("LineWidthList", [2, 1, 0]),
-                                                                                                                                    ("IncludeInXaxisAutoscaleCalculationList", [1, 1, 1]),
-                                                                                                                                    ("IncludeInYaxisAutoscaleCalculationList", [1, 1, 1]),
-                                                                                                                                    ("ColorList", ["Red", "Green", "Blue"])])),
-                                                                                        ("NumberOfDataPointToPlot", 25),
-                                                                                        ("XaxisNumberOfTickMarks", 10),
-                                                                                        ("YaxisNumberOfTickMarks", 10),
-                                                                                        ("XaxisNumberOfDecimalPlacesForLabels", 3),
-                                                                                        ("YaxisNumberOfDecimalPlacesForLabels", 3),
-                                                                                        ("XaxisAutoscaleFlag", 1),
-                                                                                        ("YaxisAutoscaleFlag", 1),
-                                                                                        ("X_min", 0.0),
-                                                                                        ("X_max", 5.0),
-                                                                                        ("Y_min", -5.0),
-                                                                                        ("Y_max", 5.0),
-                                                                                        ("XaxisDrawnAtBottomOfGraph", 0),
-                                                                                        ("XaxisLabelString", "Time (sec)"),
-                                                                                        ("YaxisLabelString", "Y-units (units)"),
-                                                                                        ("ShowLegendFlag", 1),
-                                                                                        ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder"))])
+    global MyPlotterPureTkinterStandAloneProcess_GUIparametersDict
+    MyPlotterPureTkinterStandAloneProcess_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
+                                                                    ("NumberOfPrintLines", 10),
+                                                                    ("GraphCanvasWidth", 1280),
+                                                                    ("GraphCanvasHeight", 720),
+                                                                    ("GraphCanvasWindowStartingX", 1),
+                                                                    ("GraphCanvasWindowStartingY", 2),
+                                                                    ("GraphCanvasWindowTitle", "My plotting example!"),
+                                                                    ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 20)])
+
+    global MyPlotterPureTkinterStandAloneProcess_SetupDict
+    MyPlotterPureTkinterStandAloneProcess_SetupDict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_GUIparametersDict),
+                                                            ("ParentPID", os.getpid()),
+                                                            ("WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess", 5.0),
+                                                            ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PlotCurve1", "PlotCurve2", "PlotCurve3"]),
+                                                                                                        ("MarkerSizeList", [3, 5, 1]),
+                                                                                                        ("LineWidthList", [1, 1, 0]),
+                                                                                                        ("IncludeInXaxisAutoscaleCalculationList", [1, 1, 1]),
+                                                                                                        ("IncludeInYaxisAutoscaleCalculationList", [1, 1, 1]),
+                                                                                                        ("ColorList", ["Red", "Green", "Blue"])])),
+                                                            ("SmallTextSize", 7),
+                                                            ("LargeTextSize", 12),
+                                                            ("NumberOfDataPointToPlot", 25),
+                                                            ("XaxisNumberOfTickMarks", 10),
+                                                            ("YaxisNumberOfTickMarks", 10),
+                                                            ("XaxisNumberOfDecimalPlacesForLabels", 3),
+                                                            ("YaxisNumberOfDecimalPlacesForLabels", 3),
+                                                            ("XaxisAutoscaleFlag", 1),
+                                                            ("YaxisAutoscaleFlag", 0),
+                                                            ("X_min", 0.0),
+                                                            ("X_max", 5.0),
+                                                            ("Y_min", -5.0),
+                                                            ("Y_max", 5.0),
+                                                            ("XaxisDrawnAtBottomOfGraph", 0),
+                                                            ("XaxisLabelString", "Time (sec)"),
+                                                            ("YaxisLabelString", "Y-units (units)"),
+                                                            ("ShowLegendFlag", 1),
+                                                            ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder"))])
     
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
+            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_SetupDict)
             MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
             
         except:
@@ -384,7 +418,7 @@ if __name__ == '__main__':
     ##########################################################################################################
     ##########################################################################################################
     if EXIT_PROGRAM_FLAG == 0:
-        print("$$$$$$$$$$$$$$ STARTING MAIN LOOP $$$$$$$$$$$$$$")
+        print("$$$$$$$$$$$$$$ Starting test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.py $$$$$$$$$$$$$$")
         StartingTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString()
     ##########################################################################################################
     ##########################################################################################################
@@ -397,8 +431,9 @@ if __name__ == '__main__':
         ##########################################################################################################
         ##########################################################################################################
         CurrentTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString() - StartingTime_CalculatedFromMainThread
+        LoopCounter_CalculatedFromMainThread = LoopCounter_CalculatedFromMainThread + 1
 
-        if CurrentTime_CalculatedFromMainThread > 30.0:
+        if CurrentTime_CalculatedFromMainThread > 60.0:
             ExitProgram_Callback()
         ##########################################################################################################
         ##########################################################################################################
@@ -444,6 +479,29 @@ if __name__ == '__main__':
 
             ##########################################################################################################
             try:
+                MoveGraphPositionCounter = MoveGraphPositionCounter + 1
+                if MoveGraphPositionCounter == 150:
+                    MovementScaleFactor = 0.5
+                    MyPlotterPureTkinterStandAloneProcess_GUIparametersDict["GraphCanvasWidth"] = round(1380)
+                    MyPlotterPureTkinterStandAloneProcess_GUIparametersDict["GraphCanvasHeight"] = round(820)
+                    #MyPlotterPureTkinterStandAloneProcess_GUIparametersDict["GraphCanvasWindowStartingX"] = round(MovementScaleFactor*LoopCounter_CalculatedFromMainThread)
+                    #MyPlotterPureTkinterStandAloneProcess_GUIparametersDict["GraphCanvasWindowStartingY"] = round(MovementScaleFactor*LoopCounter_CalculatedFromMainThread)
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["GUIparametersDict"] = MyPlotterPureTkinterStandAloneProcess_GUIparametersDict
+
+                    #MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalUpdateSetupDict(MyPlotterPureTkinterStandAloneProcess_SetupDict)
+
+                    MoveGraphPositionCounter = 0
+            ##########################################################################################################
+
+            ##########################################################################################################
+            except:
+                exceptions = sys.exc_info()[0]
+                print("MyPlotterPureTkinterStandAloneProcess, ProcessVariablesThatCanBeLiveUpdated: exceptions: %s" % exceptions)
+                traceback.print_exc()
+            ##########################################################################################################
+
+            ##########################################################################################################
+            try:
 
                 MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
 
@@ -452,11 +510,20 @@ if __name__ == '__main__':
 
                     if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
                         if CurrentTime_CalculatedFromMainThread - LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess >= 0.040:
+
+                            #'''
                             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["PlotCurve1",
                                                                                                                                      "PlotCurve2"],
                                                                                                                                     [CurrentTime_CalculatedFromMainThread]*2,
                                                                                                                                     [PeriodicInput_CalculatedValue_1,
                                                                                                                                     PeriodicInput_CalculatedValue_2])
+                            #'''
+
+                            '''
+                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["PlotCurve3"],
+                                                                                                                                    [CurrentTime_CalculatedFromMainThread]*1,
+                                                                                                                                    [PeriodicInput_CalculatedValue_2])
+                            '''
 
                             LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_CalculatedFromMainThread
             ##########################################################################################################
@@ -465,11 +532,13 @@ if __name__ == '__main__':
             except:
                 exceptions = sys.exc_info()[0]
                 print("MyPlotterPureTkinterStandAloneProcess, exceptions: %s" % exceptions)
-                traceback.print_exc()
+                #traceback.print_exc()
             ##########################################################################################################
 
         #########################################################################################################
-        ##########################################################################################################
+        #########################################################################################################
+
+        time.sleep(0.030)
 
     #########################################################################################################
     #########################################################################################################
@@ -477,7 +546,7 @@ if __name__ == '__main__':
 
     ######################################################################################################### THIS IS THE EXIT ROUTINE!
     #########################################################################################################
-    print("MAIN LEADER PROGRAM Exiting main program 'test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.")
+    print("Exiting test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.py")
 
     #########################################################################################################
     if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:

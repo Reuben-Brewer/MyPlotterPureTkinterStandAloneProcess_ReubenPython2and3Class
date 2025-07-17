@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision V, 07/14/2025
+Software Revision W, 07/16/2025
 
 Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -31,6 +31,7 @@ import math
 import traceback
 import re
 import keyboard
+import signal #for CTRLc_HandlerFunction
 #########################################################
 
 #########################################################
@@ -51,6 +52,26 @@ if platform.system() == "Windows":
     winmm = ctypes.WinDLL('winmm')
     winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
 #########################################################
+
+##########################################################################################################
+##########################################################################################################
+def CTRLc_RegisterHandlerFunction():
+
+    signal.signal(signal.SIGINT, CTRLc_HandlerFunction)
+
+##########################################################################################################
+##########################################################################################################
+
+########################################################################################################## MUST ISSUE CTRLc_RegisterHandlerFunction() AT START OF PROGRAM
+##########################################################################################################
+def CTRLc_HandlerFunction(signum, frame):
+
+    print("CTRLc_HandlerFunction event firing!")
+
+    ExitProgram_Callback()
+
+##########################################################################################################
+##########################################################################################################
 
 ##########################################################################################################
 ##########################################################################################################
@@ -78,6 +99,15 @@ def ExitProgram_Callback(OptionalArugment = 0):
 ##########################################################################################################
 ##########################################################################################################
 if __name__ == '__main__':
+
+    ##########################################################################################################
+    ##########################################################################################################
+    global EXIT_PROGRAM_FLAG
+    EXIT_PROGRAM_FLAG = 0
+
+    CTRLc_RegisterHandlerFunction()
+    ##########################################################################################################
+    ##########################################################################################################
 
     ##########################################################################################################
     ##########################################################################################################
@@ -115,9 +145,6 @@ if __name__ == '__main__':
 
     ##########################################################################################################
     ##########################################################################################################
-    global EXIT_PROGRAM_FLAG
-    EXIT_PROGRAM_FLAG = 0
-
     global CurrentTime_MainLoopThread
     CurrentTime_MainLoopThread = -11111.0
 
@@ -165,14 +192,16 @@ if __name__ == '__main__':
                                                                                                 ("GraphCanvasWindowTitle", "My plotting example!"),
                                                                                                 ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 20)])
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
+    global MyPlotterPureTkinterStandAloneProcess_SetupDict
+    MyPlotterPureTkinterStandAloneProcess_SetupDict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
                                                                                         ("ParentPID", os.getpid()),
                                                                                         ("WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess", 10.0),
                                                                                         ("CurvesToPlotNamesAndColorsDictOfLists", dict([("NameList", ["PlotCurve0", "PlotCurve1", "PlotCurve2"]),
                                                                                                                                         ("MarkerSizeList", [3, 2, 1]),
                                                                                                                                         ("LineWidthList", [2, 1, 0]),
                                                                                                                                         ("ColorList", ["Red", "Green", "Blue"])])),
+                                                                                        ("SmallTextSize", 7),
+                                                                                        ("LargeTextSize", 12),
                                                                                         ("NumberOfDataPointToPlot", 100),
                                                                                         ("XaxisNumberOfTickMarks", 10),
                                                                                         ("YaxisNumberOfTickMarks", 10),
@@ -191,7 +220,7 @@ if __name__ == '__main__':
 
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
+            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_SetupDict)
             MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
@@ -237,6 +266,7 @@ if __name__ == '__main__':
     ##########################################################################################################
     ##########################################################################################################
 
+    print("Starting test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_SingleShotPlot.py")
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -292,13 +322,13 @@ if __name__ == '__main__':
                 except:
                     exceptions = sys.exc_info()[0]
                     print("MyPlotterPureTkinterStandAloneProcess, exceptions: %s" % exceptions)
-                    traceback.print_exc()
+                    #traceback.print_exc()
                 ##########################################################################################################
 
             ##########################################################################################################
             ##########################################################################################################
 
-            time.sleep(0.045)
+            time.sleep(0.030)
 
         ##########################################################################################################
         ##########################################################################################################
@@ -311,7 +341,7 @@ if __name__ == '__main__':
 
     ########################################################################################################## THIS IS THE EXIT ROUTINE!
     ##########################################################################################################
-    print("MAIN LEADER PROGRAM Exiting main program 'test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.")
+    print("Exiting test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_SingleShotPlot.py")
 
     ##########################################################################################################
     if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
