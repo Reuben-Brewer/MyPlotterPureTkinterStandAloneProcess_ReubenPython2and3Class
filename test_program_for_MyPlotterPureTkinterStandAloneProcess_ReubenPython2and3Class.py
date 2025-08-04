@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision W, 07/16/2025
+Software Revision X, 08/03/2025
 
 Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -244,6 +244,30 @@ def ResetMinAndMax_ButtonResponse():
 
 ##########################################################################################################
 ##########################################################################################################
+def ClearPlot_ButtonResponse():
+    global ClearPlot_EventNeedsToBeFiredFlag
+
+    ClearPlot_EventNeedsToBeFiredFlag = 1
+
+    #print("ClearPlot_ButtonResponse event fired!")
+
+##########################################################################################################
+##########################################################################################################
+
+##########################################################################################################
+##########################################################################################################
+def ExternalUpdateSetupDict_ButtonResponse():
+    global ExternalUpdateSetupDict_EventNeedsToBeFiredFlag
+
+    ExternalUpdateSetupDict_EventNeedsToBeFiredFlag = 1
+
+    # print("ExternalUpdateSetupDict_ButtonResponse event fired!")
+
+##########################################################################################################
+##########################################################################################################
+
+##########################################################################################################
+##########################################################################################################
 def GUI_update_clock():
     global root
     global EXIT_PROGRAM_FLAG
@@ -253,7 +277,7 @@ def GUI_update_clock():
     global MyPrint_ReubenPython2and3ClassObject
     global MyPrint_OPEN_FLAG
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
+    global MyPlotterPureTkinterStandAloneProcess_Object
     global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
     global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
     global SHOW_IN_GUI_MyPlotterPureTkinterStandAloneProcess_FLAG
@@ -275,7 +299,7 @@ def GUI_update_clock():
 
             #########################################################
             #if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1 and SHOW_IN_GUI_MyPlotterPureTkinterStandAloneProcess_FLAG == 1:
-                #pass #DO NOT CALL MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GUI_update_clock() as the plotter is firing its own, internal root.after callbacks faster than in this parent root GUI loop.
+                #pass #DO NOT CALL MyPlotterPureTkinterStandAloneProcess_Object.GUI_update_clock() as the plotter is firing its own, internal root.after callbacks faster than in this parent root GUI loop.
             #########################################################
 
             root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
@@ -354,6 +378,20 @@ def GUI_Thread():
     #################################################
     ResetMinAndMax_Button = Button(AllButtonsGuiFrame, text='ResetMinAndMax', state="normal", width=20, font=("Helvetica", 8), command=lambda i=1: ResetMinAndMax_ButtonResponse())
     ResetMinAndMax_Button.grid(row=0, column=3, padx=1, pady=1, columnspan=1, rowspan=1)
+    #################################################
+    #################################################
+    
+    #################################################
+    #################################################
+    ClearPlot_Button = Button(AllButtonsGuiFrame, text='ClearPlot', state="normal", width=20, font=("Helvetica", 8), command=lambda i=1: ClearPlot_ButtonResponse())
+    ClearPlot_Button.grid(row=0, column=4, padx=1, pady=1, columnspan=1, rowspan=1)
+    #################################################
+    #################################################
+    
+    #################################################
+    #################################################
+    ExternalUpdateSetupDict_Button = Button(AllButtonsGuiFrame, text='ExternalUpdateSetupDict', state="normal", width=20, font=("Helvetica", 8), command=lambda i=1: ExternalUpdateSetupDict_ButtonResponse())
+    ExternalUpdateSetupDict_Button.grid(row=0, column=5, padx=1, pady=1, columnspan=1, rowspan=1)
     #################################################
     #################################################
 
@@ -439,7 +477,7 @@ if __name__ == '__main__':
     USE_KEYBOARD_FLAG = 1
 
     global TEST_WATCHDOG_FLAG
-    TEST_WATCHDOG_FLAG = 1
+    TEST_WATCHDOG_FLAG = 0
     ##########################################################################################################
     ##########################################################################################################
 
@@ -485,7 +523,7 @@ if __name__ == '__main__':
     root_width = 1820
 
     global root_height
-    root_height = 980
+    root_height = 50
 
     global GUI_RootAfterCallbackInterval_Milliseconds
     GUI_RootAfterCallbackInterval_Milliseconds = 30
@@ -498,6 +536,9 @@ if __name__ == '__main__':
 
     global StartingTime_CalculatedFromMainThread
     StartingTime_CalculatedFromMainThread = -11111.0
+
+    global LoopCounter_CalculatedFromMainThread
+    LoopCounter_CalculatedFromMainThread = 0
 
     global PeriodicInput_AcceptableValues
     PeriodicInput_AcceptableValues = ["GUI", "VINThub", "Sine", "Cosine", "Triangular", "Square"]
@@ -552,12 +593,21 @@ if __name__ == '__main__':
     
     global ResetMinAndMax_EventNeedsToBeFiredFlag
     ResetMinAndMax_EventNeedsToBeFiredFlag = 0
+    
+    global ClearPlot_EventNeedsToBeFiredFlag
+    ClearPlot_EventNeedsToBeFiredFlag = 0
+    
+    global ExternalUpdateSetupDict_EventNeedsToBeFiredFlag
+    ExternalUpdateSetupDict_EventNeedsToBeFiredFlag = 0
+
+    global ExternalUpdateSetupDict_EventCounter
+    ExternalUpdateSetupDict_EventCounter = 1
     ##########################################################################################################
     ##########################################################################################################
 
     ##########################################################################################################
     ##########################################################################################################
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
+    global MyPlotterPureTkinterStandAloneProcess_Object
 
     global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
     MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
@@ -603,10 +653,11 @@ if __name__ == '__main__':
                                                                                                 ("GraphCanvasWidth", 1280),
                                                                                                 ("GraphCanvasHeight", 700),
                                                                                                 ("GraphCanvasWindowStartingX", 0),
-                                                                                                ("GraphCanvasWindowStartingY", 0),
+                                                                                                ("GraphCanvasWindowStartingY", 110),
                                                                                                 ("GraphCanvasWindowTitle", "My plotting example!"),
-                                                                                                ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 20)])
-    
+                                                                                                ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 30)])
+
+
     global MyPlotterPureTkinterStandAloneProcess_SetupDict
     MyPlotterPureTkinterStandAloneProcess_SetupDict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_GUIparametersDict),
                                                                                         ("ParentPID", os.getpid()),
@@ -636,16 +687,19 @@ if __name__ == '__main__':
                                                                                         ("ShowLegendFlag", 1),
                                                                                         ("GraphNumberOfLeadingZeros", 0),
                                                                                         ("GraphNumberOfDecimalPlaces", 3),
-                                                                                        ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder"))])
+                                                                                        ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder")),
+                                                                                        ("KeepPlotterWindowAlwaysOnTopFlag", 0),
+                                                                                        ("RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag", 0),
+                                                                                        ("AllowResizingOfWindowFlag", 1)])
     
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_SetupDict)
-            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPlotterPureTkinterStandAloneProcess_Object = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_SetupDict)
+            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
             
         except:
             exceptions = sys.exc_info()[0]
-            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject, exceptions: %s" % exceptions)
+            print("MyPlotterPureTkinterStandAloneProcess_Object, exceptions: %s" % exceptions)
             #traceback.print_exc()
     ##########################################################################################################
     ##########################################################################################################
@@ -725,8 +779,9 @@ if __name__ == '__main__':
         #####################################################################################################
         #####################################################################################################
         CurrentTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString() - StartingTime_CalculatedFromMainThread
+        LoopCounter_CalculatedFromMainThread = LoopCounter_CalculatedFromMainThread + 1
 
-        if CurrentTime_CalculatedFromMainThread > 15:
+        if CurrentTime_CalculatedFromMainThread > 55:
             ExitProgram_Callback()
         #####################################################################################################
         #####################################################################################################
@@ -769,47 +824,57 @@ if __name__ == '__main__':
         ######################################################################################################
         ######################################################################################################
         if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
-
-            '''
-            #####################################################################################################
-            if TestButton_EventNeedsToBeHandledFlag == 1:
-
-
-                if MyPlotterPureTkinterStandAloneProcess_SetupDict["YaxisAutoscaleFlag"] == 0:
-                    MyPlotterPureTkinterStandAloneProcess_SetupDict["YaxisAutoscaleFlag"] = 1
-                else:
-                    MyPlotterPureTkinterStandAloneProcess_SetupDict["YaxisAutoscaleFlag"] = 0
-
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalUpdateSetupDict(MyPlotterPureTkinterStandAloneProcess_SetupDict)
-                
-                TestButton_EventNeedsToBeHandledFlag = 0
-            #####################################################################################################
-            '''
                 
             #####################################################################################################
             if ToggleAutoscale_EventNeedsToBeFiredFlag == 1:
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.SendToggleAutoscaleCommandToStandAloneProcess()
+                MyPlotterPureTkinterStandAloneProcess_Object.SendToggleAutoscaleCommandToStandAloneProcess()
                 ToggleAutoscale_EventNeedsToBeFiredFlag = 0
             #####################################################################################################
             
             #####################################################################################################
             if ToggleFreezePlot_EventNeedsToBeFiredFlag == 1:
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.SendToggleFreezePlotCommandToStandAloneProcess()
+                MyPlotterPureTkinterStandAloneProcess_Object.SendToggleFreezePlotCommandToStandAloneProcess()
                 ToggleFreezePlot_EventNeedsToBeFiredFlag = 0
             #####################################################################################################
                 
             #####################################################################################################
             if SavePlot_EventNeedsToBeFiredFlag == 1:
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.SendSavePlotCommandToStandAloneProcess()
+                MyPlotterPureTkinterStandAloneProcess_Object.SendSavePlotCommandToStandAloneProcess()
                 SavePlot_EventNeedsToBeFiredFlag = 0
             #####################################################################################################
                 
             #####################################################################################################
             if ResetMinAndMax_EventNeedsToBeFiredFlag == 1:
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.SendResetMinAndMaxCommandToStandAloneProcess()
+                MyPlotterPureTkinterStandAloneProcess_Object.SendResetMinAndMaxCommandToStandAloneProcess()
                 ResetMinAndMax_EventNeedsToBeFiredFlag = 0
             #####################################################################################################
-                
+
+            #####################################################################################################
+            if ClearPlot_EventNeedsToBeFiredFlag == 1:
+                MyPlotterPureTkinterStandAloneProcess_Object.SendClearPlotCommandToStandAloneProcess()
+                ClearPlot_EventNeedsToBeFiredFlag = 0
+            #####################################################################################################
+
+            #####################################################################################################
+            if ExternalUpdateSetupDict_EventNeedsToBeFiredFlag == 1:
+
+                if ExternalUpdateSetupDict_EventCounter % 2 == 0: #even
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["CurvesToPlotNamesAndColorsDictOfLists"]["ColorList"] = ["Red", "Green", "Blue"]
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["KeepPlotterWindowAlwaysOnTopFlag"] = 0
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag"] = 0
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["AllowResizingOfWindowFlag"] = 1
+
+                else:
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["CurvesToPlotNamesAndColorsDictOfLists"]["ColorList"] = ["Purple", "Orange", "Yellow"]
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["KeepPlotterWindowAlwaysOnTopFlag"] = 1
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag"] = 1
+                    MyPlotterPureTkinterStandAloneProcess_SetupDict["AllowResizingOfWindowFlag"] = 0
+
+                MyPlotterPureTkinterStandAloneProcess_Object.ExternalUpdateSetupDict(MyPlotterPureTkinterStandAloneProcess_SetupDict)
+                ExternalUpdateSetupDict_EventCounter = ExternalUpdateSetupDict_EventCounter + 1
+                ExternalUpdateSetupDict_EventNeedsToBeFiredFlag = 0
+            #####################################################################################################
+            
         ######################################################################################################
         ######################################################################################################
         
@@ -819,14 +884,14 @@ if __name__ == '__main__':
 
             ######################################################################################################
             try:
-                MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
+                MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_Object.GetMostRecentDataDict()
 
                 if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_MostRecentDict:
                     MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
 
                     if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
                         if CurrentTime_CalculatedFromMainThread - LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess >= MyPlotterPureTkinterStandAloneProcess_GUIparametersDict["GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents"]/1000.0 + 0.001:
-                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["PlotCurve1",
+                            MyPlotterPureTkinterStandAloneProcess_Object.ExternalAddPointOrListOfPointsToPlot(["PlotCurve1",
                                                                                                                                      "PlotCurve2"],
                                                                                                                                     [CurrentTime_CalculatedFromMainThread]*2,
                                                                                                                                     [PeriodicInput_CalculatedValue_1,
@@ -845,7 +910,7 @@ if __name__ == '__main__':
         ######################################################################################################
         ######################################################################################################
 
-        time.sleep(0.030)
+        time.sleep(0.030) #unicorn
 
     #####################################################################################################
     #####################################################################################################
@@ -864,7 +929,7 @@ if __name__ == '__main__':
     if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
 
         if TEST_WATCHDOG_FLAG == 0:
-            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
+            MyPlotterPureTkinterStandAloneProcess_Object.ExitProgram_Callback()
     ##########################################################################################################
 
     ##########################################################################################################

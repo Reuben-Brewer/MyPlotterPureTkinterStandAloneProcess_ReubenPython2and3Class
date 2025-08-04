@@ -1,0 +1,6 @@
+future
+keyboard
+numpy
+pexpect
+psutil
+pyautogui
