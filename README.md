@@ -1,4 +1,4 @@
-########################  
+########################
 
 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class
 
@@ -13,7 +13,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision W, 07/16/2025
+Software Revision X, 08/03/2025
 
 Verified working on:
 
@@ -31,14 +31,14 @@ ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 
 ########################  
 
-########################### Python module installation instructions, all OS's
+######################## Python module installation instructions, all OS's
 
-MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies: ['future.builtins', 'numpy', 'pexpect', 'psutil', 'pyautogui']
+MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies: ['GetCPUandMemoryUsageOfProcessByPID_ReubenPython3Class', 'numpy', 'pexpect', 'psutil', 'pyautogui']
 
-MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_TestProgram: ['MyPrint_ReubenPython2and3Class']
+MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_TestProgram: ['keyboard', 'MyPrint_ReubenPython2and3Class']
 
-MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_NestedLayers: ['future.builtins']
+MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_NestedLayers: ['future.builtins', 'psutil']
 
-MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_All:['future.builtins', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil', 'pyautogui']
+MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, ListOfModuleDependencies_All:['future.builtins', 'GetCPUandMemoryUsageOfProcessByPID_ReubenPython3Class', 'keyboard', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil', 'pyautogui']
 
-###########################
+########################
