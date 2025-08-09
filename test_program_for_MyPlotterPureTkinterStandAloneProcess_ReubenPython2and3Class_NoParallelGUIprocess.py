@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision X, 08/03/2025
+Software Revision Y, 08/08/2025
 
 Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
@@ -55,12 +55,21 @@ if platform.system() == "Windows":
     winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
 #########################################################
 
-##########################################################################################################
+########################################################################################################## MUST ISSUE CTRLc_RegisterHandlerFunction() AT START OF PROGRAM
 ##########################################################################################################
 def CTRLc_RegisterHandlerFunction():
 
-    signal.signal(signal.SIGINT, CTRLc_HandlerFunction)
+    CurrentHandlerRegisteredForSIGINT = signal.getsignal(signal.SIGINT)
+    #print("CurrentHandlerRegisteredForSIGINT: " + str(CurrentHandlerRegisteredForSIGINT))
 
+    defaultish = (signal.SIG_DFL, signal.SIG_IGN, None, getattr(signal, "default_int_handler", None)) #Treat Python's built-in default handler as "unregistered"
+
+    if CurrentHandlerRegisteredForSIGINT in defaultish: # Only install if it's default/ignored (i.e., nobody set it yet)
+        signal.signal(signal.SIGINT, CTRLc_HandlerFunction)
+        print("test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.py, CTRLc_RegisterHandlerFunction event fired!")
+
+    else:
+        print("test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class_NoParallelGUIprocess.py, could not register CTRLc_RegisterHandlerFunction (already registered previously)")
 ##########################################################################################################
 ##########################################################################################################
 
@@ -214,7 +223,11 @@ if __name__ == '__main__':
     ##########################################################################################################
     global EXIT_PROGRAM_FLAG
     EXIT_PROGRAM_FLAG = 0
+    ##########################################################################################################
+    ##########################################################################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
     CTRLc_RegisterHandlerFunction()
     ##########################################################################################################
     ##########################################################################################################

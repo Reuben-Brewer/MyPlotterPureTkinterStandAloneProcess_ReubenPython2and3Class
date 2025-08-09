@@ -6,7 +6,7 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision X, 08/03/2025
+Software Revision Y, 08/08/2025
 
 Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 '''
@@ -153,14 +153,21 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
     ##########################################################################################################
     ##########################################################################################################
 
-    ##########################################################################################################
+    ###########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
     def CTRLc_RegisterHandlerFunction(self):
 
-        signal.signal(signal.SIGINT, self.CTRLc_HandlerFunction)
+        CurrentHandlerRegisteredForSIGINT = signal.getsignal(signal.SIGINT)
+        defaultish = (signal.SIG_DFL, signal.SIG_IGN, None, getattr(signal, "default_int_handler", None)) #Treat Python's built-in default handler as "unregistered"
 
+        if CurrentHandlerRegisteredForSIGINT in defaultish:  # Only install if it's default/ignored (i.e., nobody set it yet)
+            signal.signal(signal.SIGINT, self.CTRLc_HandlerFunction)
+            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, CTRLc_RegisterHandlerFunction event fired!")
+
+        else:
+            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class, could not register CTRLc_RegisterHandlerFunction (already registered previously)")
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -211,7 +218,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ##########################################################################################################
         ##########################################################################################################
         ########################################################################################################## UNICORN
-        self.RootGeometryHasBeenModifiedFlag = 0
+        self.RootGeometryHasBeenModifiedFlag = 1 #By default, ALWAYS clear the graph when we enter this function.
         ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################
@@ -270,7 +277,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
             ##########################################
             if "GraphCanvasWidth" in GUIparametersDict:
                 self.GraphCanvasWidth = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GraphCanvasWidth", GUIparametersDict["GraphCanvasWidth"], 480.0, 1000000.0)
-                self.RootGeometryHasBeenModifiedFlag = 1
             else:
                 self.GraphCanvasWidth = 640.0
 
@@ -282,7 +288,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
             ##########################################
             if "GraphCanvasHeight" in GUIparametersDict:
                 self.GraphCanvasHeight = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GraphCanvasHeight", GUIparametersDict["GraphCanvasHeight"], 240.0, 1000000.0)
-                self.RootGeometryHasBeenModifiedFlag = 1
             else:
                 self.GraphCanvasHeight = 480.0
 
@@ -294,7 +299,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
             ##########################################
             if "GraphCanvasWindowTitle" in GUIparametersDict:
                 self.GraphCanvasWindowTitle = str(GUIparametersDict["GraphCanvasWindowTitle"])
-                self.RootGeometryHasBeenModifiedFlag = 1
             else:
                 self.GraphCanvasWindowTitle = "MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class"
 
@@ -306,8 +310,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
             ##########################################
             if "GraphCanvasWindowStartingX" in GUIparametersDict:
                 self.GraphCanvasWindowStartingX = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GraphCanvasWindowStartingX", GUIparametersDict["GraphCanvasWindowStartingX"], 0.0, 1000000.0))
-                self.RootGeometryHasBeenModifiedFlag = 1
-
             else:
                 self.GraphCanvasWindowStartingX = 0.0
 
@@ -319,8 +321,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
             ##########################################
             if "GraphCanvasWindowStartingY" in GUIparametersDict:
                 self.GraphCanvasWindowStartingY = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GraphCanvasWindowStartingY", GUIparametersDict["GraphCanvasWindowStartingY"], 0.0, 1000000.0))
-                self.RootGeometryHasBeenModifiedFlag = 1
-
             else:
                 self.GraphCanvasWindowStartingY = 0.0
 
@@ -712,7 +712,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ##########################################
         if "KeepPlotterWindowAlwaysOnTopFlag" in SetupDict:
             self.KeepPlotterWindowAlwaysOnTopFlag = self.PassThrough0and1values_ExitProgramOtherwise("KeepPlotterWindowAlwaysOnTopFlag", SetupDict["KeepPlotterWindowAlwaysOnTopFlag"])
-            self.RootGeometryHasBeenModifiedFlag = 1
         else:
             self.KeepPlotterWindowAlwaysOnTopFlag = 0
 
@@ -724,7 +723,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ##########################################
         if "RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag" in SetupDict:
             self.RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag = self.PassThrough0and1values_ExitProgramOtherwise("RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag", SetupDict["RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag"])
-            self.RootGeometryHasBeenModifiedFlag = 1
         else:
             self.RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag = 0
 
@@ -736,7 +734,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ##########################################
         if "AllowResizingOfWindowFlag" in SetupDict:
             self.AllowResizingOfWindowFlag = self.PassThrough0and1values_ExitProgramOtherwise("AllowResizingOfWindowFlag", SetupDict["AllowResizingOfWindowFlag"])
-            self.RootGeometryHasBeenModifiedFlag = 1
         else:
             self.AllowResizingOfWindowFlag = 1
 
