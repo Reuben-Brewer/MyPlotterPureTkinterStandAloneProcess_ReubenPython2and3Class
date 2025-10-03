@@ -6,7 +6,7 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision Y, 08/08/2025
+Software Revision Z, 10/02/2025
 
 Verified working on: Python 3.11/12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 '''
@@ -1948,7 +1948,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ###################################################
         self.root.title(self.GraphCanvasWindowTitle)
         self.root.protocol("WM_DELETE_WINDOW", self.ExitProgram_Callback)
-        self.root.geometry('%dx%d+%d+%d' % (self.GraphCanvasWidth, self.GraphCanvasHeight + 50, self.GraphCanvasWindowStartingX, self.GraphCanvasWindowStartingY))  # +50 for Debug_Label
+        self.root.geometry('%dx%d+%d+%d' % (self.GraphCanvasWidth, self.GraphCanvasHeight + 80, self.GraphCanvasWindowStartingX, self.GraphCanvasWindowStartingY))  # +50 for Debug_Label
         self.root.after(self.GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents, self.__GUI_update_clock)
         ###################################################
         ###################################################
@@ -1988,7 +1988,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
 
         ###################################################
         ###################################################
-        self.myFrame = Frame(self.root)
+        self.myFrame = Frame(self.root, bg="white")
         self.myFrame.grid()
         ###################################################
         ###################################################
@@ -2024,7 +2024,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
 
         ###################################################
         ###################################################
-        self.Debug_Label = Label(self.myFrame, text="Debug_Label", width=100)
+        self.Debug_Label = Label(self.myFrame, text="Debug_Label", width=100, bg="white")
         self.Debug_Label.grid(row=1, column=0, padx=0, pady=0, columnspan=1, rowspan=1, sticky="w")
         ###################################################
         ###################################################
@@ -2032,7 +2032,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ###################################################
         ###################################################
         self.PlotControlsFrame = Frame(self.myFrame, bg="white")
-        self.PlotControlsFrame.grid(row=2, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.PlotControlsFrame.grid(row=2, column=0, padx=1, pady=1, columnspan=1, rowspan=1, sticky="w")
         ###################################################
         ###################################################
 
@@ -2048,14 +2048,14 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ###################################################
         ###################################################
         self.ToggleFreezePlot_Button = Button(self.PlotControlsFrame, text='Freeze Plot', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.ToggleFreezePlot_ButtonResponse())
-        self.ToggleFreezePlot_Button.grid(row=0, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.ToggleFreezePlot_Button.grid(row=1, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
         ###################################################
         ###################################################
 
         ###################################################
         ###################################################
         self.SavePlot_Button = Button(self.PlotControlsFrame, text='Save Plot', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.SavePlot_ButtonResponse())
-        self.SavePlot_Button.grid(row=0, column=2, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.SavePlot_Button.grid(row=0, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
 
         if self.pyautogui_ModuleImportedFlag == 0:
             self.SavePlot_Button["state"] = "disabled"
@@ -2079,12 +2079,12 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ###################################################
         ###################################################
         self.Y_max_label = Label(self.PlotControlsFrame, text="Y_max", width=15, bg="white")
-        self.Y_max_label.grid(row=0, column=5, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.Y_max_label.grid(row=1, column=3, padx=1, pady=1, columnspan=1, rowspan=1)
 
         self.Y_max_StringVar = StringVar()
         self.Y_max_StringVar.set(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.Y_max, self.GraphNumberOfLeadingZeros, self.GraphNumberOfDecimalPlaces))
         self.Y_max_Entry = Entry(self.PlotControlsFrame, width=15, state="normal", textvariable=self.Y_max_StringVar)
-        self.Y_max_Entry.grid(row=0, column=6, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.Y_max_Entry.grid(row=1, column=4, padx=1, pady=1, columnspan=1, rowspan=1)
         self.Y_max_Entry.bind('<Return>', lambda event: self.Y_max_Entry_Response(event))
         ###################################################
         ###################################################
@@ -2099,23 +2099,15 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
         ###################################################
         ###################################################
         self.ClearPlot_Button = Button(self.PlotControlsFrame, text='Clear', state="normal", width=self.ButtonWidth, font=("Helvetica", 8), command=lambda i=1: self.ClearPlot_ButtonResponse())
-        self.ClearPlot_Button.grid(row=0, column=8, padx=1, pady=1, columnspan=1, rowspan=1)
+        self.ClearPlot_Button.grid(row=1, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
         ###################################################
         ###################################################
 
         ###################################################
         ###################################################
-        self.PrintToGui_Label = Label(self.myFrame, text="PrintToGui_Label", width=100)
+        self.PrintToGui_Label = Label(self.myFrame, text="PrintToGui_Label", width=100, bg="white")
         if self.EnableInternal_MyPrint_Flag == 1:
-            self.PrintToGui_Label.grid(row=0, column=3, padx=0, pady=0, columnspan=1, rowspan=10)
-        ###################################################
-        ###################################################
-
-        ###################################################
-        ###################################################
-        self.myFrame["bg"] = "white"
-        self.Debug_Label["bg"] = "white"
-        self.PrintToGui_Label["bg"] = "white"
+            self.PrintToGui_Label.grid(row=3, column=0, padx=0, pady=0, columnspan=1, rowspan=1)
         ###################################################
         ###################################################
 
@@ -3109,13 +3101,14 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame):  # Su
                 ##########################################################################################################
                 ##########################################################################################################
                 self.Debug_Label["text"] = "P.PID = " + str(self.ParentPID) + \
-                                           ", SelfPID = " + str(self.SelfPID) + \
-                                           ", Time: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.CurrentTime_CalculatedFromGUIthread, 0, 1) + \
-                                           ", Freq: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.LoopFrequency_CalculatedFromGUIthread, 0, 3) + \
-                                           ", CPU %: " + str(self.MemoryUsageOfProcessByPID_Dict["CPUusage_Percent"]) + \
-                                           ", MEM %: " + str(self.MemoryUsageOfProcessByPID_Dict["MemoryUsage_Percent"]) + \
-                                           ", #: " + str(len(self.CanvasForDrawingGraph.find_all())) + \
-                                           ", Watchdog: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.TimeIntoWatchdogTimer, 0, 3)
+                                            ", SelfPID = " + str(self.SelfPID) + \
+                                            ", Time: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.CurrentTime_CalculatedFromGUIthread, 0, 1) + \
+                                            ", Freq: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.LoopFrequency_CalculatedFromGUIthread, 2, 3) + \
+                                            ", CPU %: " + str(self.MemoryUsageOfProcessByPID_Dict["CPUusage_Percent"]) + \
+                                            ", MEM %: " + str(self.MemoryUsageOfProcessByPID_Dict["MemoryUsage_Percent"]) + \
+                                            ", #: " + str(len(self.CanvasForDrawingGraph.find_all())) + \
+                                            ", Watchdog: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.TimeIntoWatchdogTimer, 0, 3)
+
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
